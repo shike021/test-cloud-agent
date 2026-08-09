@@ -6,7 +6,10 @@
  * satisfies the autoplay policies of modern browsers.
  */
 
-/** @typedef {'eat' | 'bonus' | 'levelUp' | 'gameOver' | 'win'} SoundName */
+/**
+ * @typedef {'eat' | 'bonus' | 'levelUp' | 'gameOver' | 'win' | 'place' | 'placeAlt' | 'undo'}
+ *   SoundName
+ */
 
 /**
  * @typedef {object} Tone
@@ -37,6 +40,11 @@ const EFFECTS = {
     { frequency: 784, duration: 0.12, delay: 0.24, type: 'triangle', gain: 0.14 },
     { frequency: 1047, duration: 0.24, delay: 0.36, type: 'triangle', gain: 0.14 },
   ],
+  /** Dry click of a stone hitting the board. */
+  place: [{ frequency: 300, endFrequency: 170, duration: 0.07, type: 'triangle', gain: 0.16 }],
+  /** Brighter variant, so the two gomoku players are audibly distinct. */
+  placeAlt: [{ frequency: 430, endFrequency: 250, duration: 0.07, type: 'triangle', gain: 0.13 }],
+  undo: [{ frequency: 330, endFrequency: 196, duration: 0.14, type: 'sine', gain: 0.1 }],
 };
 
 export class SoundPlayer {
