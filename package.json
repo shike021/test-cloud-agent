@@ -1,8 +1,8 @@
 {
-  "name": "snake-game",
-  "version": "1.0.0",
+  "name": "web-arcade",
+  "version": "1.1.0",
   "private": true,
-  "description": "生产级纯前端贪吃蛇游戏：支持键盘、触控与手势操作，含计分、暂停、难度设置与 GitHub Pages 部署。",
+  "description": "生产级纯前端小游戏合集：贪吃蛇与 15×15 双人五子棋，含游戏大厅、多页构建与 GitHub Pages 部署。",
   "type": "module",
   "license": "MIT",
   "engines": {

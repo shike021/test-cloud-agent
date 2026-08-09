@@ -6,14 +6,20 @@
     <meta name="theme-color" content="#0b1220" />
     <meta name="description" content="使用方向键或 WASD 操作的贪吃蛇游戏，支持桌面与移动端，含计分、暂停与难度设置。" />
     <title>贪吃蛇 · Snake</title>
-    <link rel="icon" href="./public/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./src/styles/main.css" />
+    <link rel="icon" href="../public/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../src/styles/main.css" />
   </head>
   <body>
     <div class="app">
-      <header class="app__header">
-        <h1 class="app__title">贪吃蛇</h1>
-        <p class="app__tagline">方向键 / WASD 控制 · 空格暂停 · R 重开</p>
+      <header class="app__header app__header--game">
+        <a class="app__back" href="../index.html">
+          <span aria-hidden="true">←</span>
+          游戏大厅
+        </a>
+        <div class="app__heading">
+          <h1 class="app__title">贪吃蛇</h1>
+          <p class="app__tagline">方向键 / WASD 控制 · 空格暂停 · R 重开</p>
+        </div>
       </header>
 
       <main class="game">
@@ -142,6 +148,6 @@
 
     <p class="visually-hidden" id="live-region" role="status" aria-live="polite"></p>
 
-    <script type="module" src="./src/js/main.js"></script>
+    <script type="module" src="../src/js/main.js"></script>
   </body>
 </html>

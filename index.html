@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1220" />
+    <meta name="description" content="纯前端小游戏合集：贪吃蛇与五子棋，无第三方运行时依赖，桌面与移动端均可畅玩。" />
+    <title>Web Arcade · 小游戏合集</title>
+    <link rel="icon" href="./public/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./src/styles/lobby.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app__header">
+        <h1 class="app__title">Web Arcade</h1>
+        <p class="app__tagline">纯前端小游戏合集 · 零运行时依赖 · 桌面与移动端均可畅玩</p>
+      </header>
+
+      <main class="lobby">
+        <h2 class="visually-hidden">游戏列表</h2>
+        <ul class="lobby__grid">
+          <li>
+            <a class="card" href="./snake/index.html" data-shortcut="Digit1">
+              <span class="card__shortcut" aria-hidden="true">1</span>
+              <span class="card__art card__art--snake" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 44h16a8 8 0 0 0 0-16H20a8 8 0 0 1 0-16h20" stroke="currentColor" stroke-width="6" />
+                  <circle cx="46" cy="12" r="5" fill="currentColor" />
+                  <circle cx="48" cy="46" r="5" fill="#ff5d73" />
+                </svg>
+              </span>
+              <span class="card__body">
+                <span class="card__title">贪吃蛇</span>
+                <span class="card__description">
+                  固定步长循环与帧间插值，滑动手感顺滑；含难度、穿墙模式与限时奖励果实。
+                </span>
+                <span class="card__tags">
+                  <span class="tag">单人</span>
+                  <span class="tag">键盘 / 触控</span>
+                  <span class="tag">Canvas</span>
+                </span>
+                <span class="card__stat">最高分 <output id="snake-best">0</output></span>
+              </span>
+              <span class="card__cta">
+                开始游戏
+                <span aria-hidden="true">→</span>
+              </span>
+            </a>
+          </li>
+
+          <li>
+            <a class="card" href="./gomoku/index.html" data-shortcut="Digit2">
+              <span class="card__shortcut" aria-hidden="true">2</span>
+              <span class="card__art card__art--gomoku" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <g stroke="currentColor" stroke-width="3" opacity="0.75">
+                    <path d="M12 12h40M12 26h40M12 40h40M12 54h40" />
+                    <path d="M12 12v42M26 12v42M40 12v42M54 12v42" />
+                  </g>
+                  <circle cx="26" cy="26" r="7" fill="#0d1420" stroke="#7f8ea3" stroke-width="2" />
+                  <circle cx="40" cy="40" r="7" fill="#f2f6fc" />
+                  <circle cx="40" cy="26" r="7" fill="#0d1420" stroke="#7f8ea3" stroke-width="2" />
+                </svg>
+              </span>
+              <span class="card__body">
+                <span class="card__title">五子棋</span>
+                <span class="card__description">
+                  15×15 标准棋盘，双人同机对战；支持撤销、交替先手、坐标显示与战绩统计。
+                </span>
+                <span class="card__tags">
+                  <span class="tag">双人同机</span>
+                  <span class="tag">鼠标 / 键盘</span>
+                  <span class="tag">Canvas</span>
+                </span>
+                <span class="card__stat">
+                  战绩 黑 <output id="gomoku-black">0</output> : <output id="gomoku-white">0</output> 白 · 和
+                  <output id="gomoku-draws">0</output>
+                </span>
+              </span>
+              <span class="card__cta">
+                开始对局
+                <span aria-hidden="true">→</span>
+              </span>
+            </a>
+          </li>
+        </ul>
+
+        <section class="legend" aria-label="使用说明">
+          <h2 class="legend__title">说明</h2>
+          <ul class="legend__list">
+            <li>按 <kbd>1</kbd> / <kbd>2</kbd> 可直接进入对应游戏。</li>
+            <li>两款游戏均为原生 HTML / CSS / ES Modules 实现，规则逻辑与渲染完全解耦。</li>
+            <li>最高分、战绩与偏好设置保存在浏览器本地，隐私模式下自动降级为内存存储。</li>
+          </ul>
+        </section>
+      </main>
+
+      <footer class="app__footer">
+        <p>纯前端实现 · 无第三方运行时依赖</p>
+      </footer>
+    </div>
+
+    <script type="module" src="./src/js/lobby/main.js"></script>
+  </body>
+</html>

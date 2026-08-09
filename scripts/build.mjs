@@ -2,11 +2,11 @@
 /**
  * Production build.
  *
- * Bundles and minifies the ES module sources plus the stylesheet into
- * content-hashed assets, rewrites the asset references in `index.html` and
- * copies the static `public/` folder. The output in `dist/` is a self-contained
- * static site that can be served from any web root, including a GitHub Pages
- * sub-path, because every reference stays relative.
+ * Bundles and minifies the ES module sources plus the stylesheet of every page
+ * into content-hashed assets, rewrites the asset references in the HTML entry
+ * points and copies the static `public/` folder. The output in `dist/` is a
+ * self-contained static site that can be served from any web root, including a
+ * GitHub Pages sub-path, because every reference stays relative.
  */
 
 import { build } from 'esbuild';
@@ -19,6 +19,45 @@ import { fileURLToPath } from 'node:url';
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = path.join(projectRoot, 'dist');
 const assetsDirName = 'assets';
+
+/**
+ * The pages of the arcade. Paths are relative to the project root and use
+ * forward slashes, exactly as they appear in the HTML sources.
+ *
+ * @type {readonly { name: string, html: string, script: string, style: string }[]}
+ */
+const PAGES = Object.freeze([
+  {
+    name: 'lobby',
+    html: 'index.html',
+    script: 'src/js/lobby/main.js',
+    style: 'src/styles/lobby.css',
+  },
+  {
+    name: 'snake',
+    html: 'snake/index.html',
+    script: 'src/js/main.js',
+    style: 'src/styles/main.css',
+  },
+  {
+    name: 'gomoku',
+    html: 'gomoku/index.html',
+    script: 'src/js/gomoku/main.js',
+    style: 'src/styles/gomoku.css',
+  },
+]);
+
+/**
+ * Builds the relative reference an HTML file uses to point at a target file.
+ *
+ * @param {string} htmlPath Page path relative to the project root.
+ * @param {string} targetPath Target path relative to the same root.
+ * @returns {string} A reference that always starts with `./` or `../`.
+ */
+function referenceFrom(htmlPath, targetPath) {
+  const relative = path.relative(path.dirname(htmlPath), targetPath).split(path.sep).join('/');
+  return relative.startsWith('.') ? relative : `./${relative}`;
+}
 
 /**
  * @param {import('esbuild').Metafile} metafile
@@ -35,16 +74,20 @@ function findEntryOutput(metafile, extension) {
   return path.relative(outDir, path.join(projectRoot, match[0])).split(path.sep).join('/');
 }
 
-async function bundleJavaScript() {
+/**
+ * @param {(typeof PAGES)[number]} page
+ * @returns {Promise<string>} Bundle path relative to `dist/`.
+ */
+async function bundleJavaScript(page) {
   const result = await build({
-    entryPoints: [path.join(projectRoot, 'src/js/main.js')],
+    entryPoints: [path.join(projectRoot, page.script)],
     bundle: true,
     format: 'esm',
     target: ['es2022'],
     minify: true,
     sourcemap: 'linked',
     legalComments: 'none',
-    entryNames: `${assetsDirName}/app-[hash]`,
+    entryNames: `${assetsDirName}/${page.name}-[hash]`,
     outdir: outDir,
     metafile: true,
     logLevel: 'warning',
@@ -52,14 +95,18 @@ async function bundleJavaScript() {
   return findEntryOutput(result.metafile, '.js');
 }
 
-async function bundleStyles() {
+/**
+ * @param {(typeof PAGES)[number]} page
+ * @returns {Promise<string>} Stylesheet path relative to `dist/`.
+ */
+async function bundleStyles(page) {
   const result = await build({
-    entryPoints: [path.join(projectRoot, 'src/styles/main.css')],
+    entryPoints: [path.join(projectRoot, page.style)],
     bundle: true,
     minify: true,
     sourcemap: 'linked',
     loader: { '.svg': 'file' },
-    entryNames: `${assetsDirName}/style-[hash]`,
+    entryNames: `${assetsDirName}/${page.name}-[hash]`,
     assetNames: `${assetsDirName}/[name]-[hash]`,
     outdir: outDir,
     metafile: true,
@@ -69,25 +116,40 @@ async function bundleStyles() {
 }
 
 /**
- * @param {string} scriptPath
- * @param {string} stylePath
+ * Rewrites the source references of one page to its hashed bundles.
+ *
+ * @param {(typeof PAGES)[number]} page
+ * @param {string} scriptPath Bundle path relative to `dist/`.
+ * @param {string} stylePath Stylesheet path relative to `dist/`.
  */
-async function emitHtml(scriptPath, stylePath) {
-  const source = await readFile(path.join(projectRoot, 'index.html'), 'utf8');
+async function emitHtml(page, scriptPath, stylePath) {
+  const source = await readFile(path.join(projectRoot, page.html), 'utf8');
   const replacements = [
-    ['./src/styles/main.css', `./${stylePath}`],
-    ['./src/js/main.js', `./${scriptPath}`],
+    [referenceFrom(page.html, page.style), referenceFrom(page.html, stylePath)],
+    [referenceFrom(page.html, page.script), referenceFrom(page.html, scriptPath)],
   ];
 
   let html = source;
   for (const [from, to] of replacements) {
     if (!html.includes(from)) {
-      throw new Error(`index.html does not reference "${from}"; the build cannot rewrite it.`);
+      throw new Error(`${page.html} does not reference "${from}"; the build cannot rewrite it.`);
     }
     html = html.replaceAll(from, to);
   }
 
-  await writeFile(path.join(outDir, 'index.html'), html, 'utf8');
+  const target = path.join(outDir, page.html);
+  await mkdir(path.dirname(target), { recursive: true });
+  await writeFile(target, html, 'utf8');
+}
+
+/**
+ * @param {(typeof PAGES)[number]} page
+ * @returns {Promise<string[]>} Emitted files, relative to `dist/`.
+ */
+async function buildPage(page) {
+  const [scriptPath, stylePath] = await Promise.all([bundleJavaScript(page), bundleStyles(page)]);
+  await emitHtml(page, scriptPath, stylePath);
+  return [page.html, scriptPath, stylePath];
 }
 
 async function copyStaticFiles() {
@@ -116,10 +178,10 @@ async function main() {
   await rm(outDir, { recursive: true, force: true });
   await mkdir(outDir, { recursive: true });
 
-  const [scriptPath, stylePath] = await Promise.all([bundleJavaScript(), bundleStyles()]);
-  await emitHtml(scriptPath, stylePath);
+  // The pages share modules but not bundles, so they can be built in parallel.
+  const emitted = await Promise.all(PAGES.map((page) => buildPage(page)));
   await copyStaticFiles();
-  await reportSizes(['index.html', scriptPath, stylePath]);
+  await reportSizes(emitted.flat());
 }
 
 main().catch((error) => {

@@ -55,12 +55,18 @@ jobs:
 
       - name: Verify build output
         run: |
-          test -f dist/index.html || { echo "dist/index.html is missing"; exit 1; }
           test -f dist/.nojekyll || { echo "dist/.nojekyll is missing"; exit 1; }
           test -f dist/public/favicon.svg || { echo "dist/public/favicon.svg is missing"; exit 1; }
-          test -n "$(find dist/assets -name '*.js' -print -quit)" || { echo "no JS bundle emitted"; exit 1; }
-          test -n "$(find dist/assets -name '*.css' -print -quit)" || { echo "no CSS bundle emitted"; exit 1; }
-          grep -q 'assets/app-' dist/index.html || { echo "index.html was not rewritten to the hashed bundle"; exit 1; }
+          # Every page of the arcade must ship its own HTML plus hashed bundles,
+          # and its HTML must point at them instead of at the sources.
+          for page in "lobby:index.html" "snake:snake/index.html" "gomoku:gomoku/index.html"; do
+            name="${page%%:*}"
+            html="dist/${page#*:}"
+            test -f "$html" || { echo "$html is missing"; exit 1; }
+            test -n "$(find dist/assets -name "$name-*.js" -print -quit)" || { echo "no JS bundle emitted for $name"; exit 1; }
+            test -n "$(find dist/assets -name "$name-*.css" -print -quit)" || { echo "no CSS bundle emitted for $name"; exit 1; }
+            grep -q "assets/$name-" "$html" || { echo "$html was not rewritten to the hashed bundles"; exit 1; }
+          done
 
       - name: Upload build artifact
         if: matrix.node-version == '22.x'

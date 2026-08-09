@@ -3,11 +3,12 @@
  * Static integrity check for the shipped front-end.
  *
  * Catches the classes of breakage that a unit test cannot see:
- *   1. `index.html` references an asset that does not exist on disk.
+ *   1. An entry page references an asset that does not exist on disk.
  *   2. An asset is referenced with a root-absolute path, which breaks when the
  *      site is served from a GitHub Pages sub-path.
  *   3. An ES module imports a relative file that is missing (typo in a path).
  *   4. A stylesheet references a missing `url()` asset.
+ *   5. An entry page of the arcade is missing entirely.
  *
  * Usage: node scripts/check-assets.mjs [--root .]
  */
@@ -19,6 +20,9 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+/** Every HTML entry point of the arcade, relative to the checked root. */
+const ENTRY_PAGES = Object.freeze(['index.html', 'snake/index.html', 'gomoku/index.html']);
 
 const HTML_REFERENCE_PATTERN = /(?:href|src)\s*=\s*"([^"]+)"/g;
 const IMPORT_PATTERN =
@@ -176,14 +180,22 @@ async function main() {
       ? projectRoot
       : path.resolve(projectRoot, process.argv[rootArgumentIndex + 1] ?? '.');
 
-  const entryHtml = path.join(root, 'index.html');
-  if (!existsSync(entryHtml)) {
-    console.error(`Asset check failed: ${path.relative(projectRoot, entryHtml)} is missing.`);
+  /** @type {string[]} */
+  const missingPages = [];
+  for (const page of ENTRY_PAGES) {
+    const entryHtml = path.join(root, page);
+    if (!existsSync(entryHtml)) {
+      missingPages.push(path.relative(projectRoot, entryHtml));
+      continue;
+    }
+    await checkHtml(entryHtml);
+  }
+
+  if (missingPages.length > 0) {
+    console.error(`Asset check failed: missing entry page(s): ${missingPages.join(', ')}.`);
     process.exitCode = 1;
     return;
   }
-
-  await checkHtml(entryHtml);
 
   if (errors.length > 0) {
     console.error(`Asset check failed with ${errors.length} problem(s):`);
@@ -195,8 +207,8 @@ async function main() {
   }
 
   console.log(
-    `Asset check passed: ${checkedReferences} reference(s) resolved across ` +
-      `${visitedModules.size} module/stylesheet file(s).`,
+    `Asset check passed: ${ENTRY_PAGES.length} entry page(s), ${checkedReferences} ` +
+      `reference(s) resolved across ${visitedModules.size} module/stylesheet file(s).`,
   );
 }
 
