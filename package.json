@@ -1,0 +1,32 @@
+{
+  "name": "test-cloud-agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Full-stack task manager used to validate the Cloud Agent development environment.",
+  "workspaces": [
+    "packages/server",
+    "packages/web"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "npm-run-all --parallel dev:server dev:web",
+    "dev:server": "npm run dev --workspace @app/server",
+    "dev:web": "npm run dev --workspace @app/web",
+    "build": "npm run build --workspace @app/server && npm run build --workspace @app/web",
+    "start": "npm run start --workspace @app/server",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "eslint": "^9.18.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
+    "npm-run-all2": "^7.0.2",
+    "typescript-eslint": "^8.20.0"
+  }
+}
