@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1220" />
+    <meta name="description" content="使用方向键或 WASD 操作的贪吃蛇游戏，支持桌面与移动端，含计分、暂停与难度设置。" />
+    <title>贪吃蛇 · Snake</title>
+    <link rel="icon" href="./public/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./src/styles/main.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app__header">
+        <h1 class="app__title">贪吃蛇</h1>
+        <p class="app__tagline">方向键 / WASD 控制 · 空格暂停 · R 重开</p>
+      </header>
+
+      <main class="game">
+        <section class="scoreboard" aria-label="计分板">
+          <div class="stat">
+            <span class="stat__label">得分</span>
+            <output class="stat__value" id="score">0</output>
+          </div>
+          <div class="stat">
+            <span class="stat__label">最高分</span>
+            <output class="stat__value" id="best-score">0</output>
+          </div>
+          <div class="stat">
+            <span class="stat__label">等级</span>
+            <output class="stat__value" id="level">1</output>
+          </div>
+          <div class="stat">
+            <span class="stat__label">长度</span>
+            <output class="stat__value" id="length">4</output>
+          </div>
+        </section>
+
+        <div class="board" id="board-frame">
+          <canvas id="board" class="board__canvas" role="img" aria-label="贪吃蛇棋盘"></canvas>
+          <div class="overlay" id="overlay" data-status="idle">
+            <h2 class="overlay__title" id="overlay-title">准备开始</h2>
+            <p class="overlay__message" id="overlay-message">使用方向键或 WASD 控制蛇的移动，吃到果实即可成长。</p>
+            <button class="button button--primary" id="overlay-action" type="button">开始游戏</button>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="button button--primary" id="start-pause" type="button" data-action="start">开始 (空格)</button>
+          <button class="button" id="restart" type="button">重新开始 (R)</button>
+          <button
+            class="button button--icon"
+            id="mute"
+            type="button"
+            aria-pressed="true"
+            data-state="unmuted"
+            title="关闭音效 (M)"
+          >
+            <svg
+              class="button__icon button__icon--audible"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M11 5 6 9H3v6h3l5 4z" />
+              <path d="M16 9a4 4 0 0 1 0 6" />
+              <path d="M19 6a8 8 0 0 1 0 12" />
+            </svg>
+            <svg
+              class="button__icon button__icon--muted"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M11 5 6 9H3v6h3l5 4z" />
+              <path d="m17 9 5 6" />
+              <path d="m22 9-5 6" />
+            </svg>
+            <span data-label>音效开</span>
+          </button>
+        </div>
+
+        <div class="dpad" id="dpad" role="group" aria-label="方向控制">
+          <button class="dpad__button dpad__button--up" type="button" data-direction="up" aria-label="向上">
+            <span aria-hidden="true">▲</span>
+          </button>
+          <button class="dpad__button dpad__button--left" type="button" data-direction="left" aria-label="向左">
+            <span aria-hidden="true">◀</span>
+          </button>
+          <button class="dpad__button dpad__button--right" type="button" data-direction="right" aria-label="向右">
+            <span aria-hidden="true">▶</span>
+          </button>
+          <button class="dpad__button dpad__button--down" type="button" data-direction="down" aria-label="向下">
+            <span aria-hidden="true">▼</span>
+          </button>
+        </div>
+
+        <section class="settings" aria-label="游戏设置">
+          <label class="settings__field" for="difficulty">
+            <span>难度</span>
+            <select class="settings__select" id="difficulty">
+              <option value="easy">轻松</option>
+              <option value="normal">标准</option>
+              <option value="hard">困难</option>
+            </select>
+          </label>
+          <label class="settings__field settings__field--switch" for="wrap-walls">
+            <span>穿墙模式</span>
+            <input class="settings__checkbox" id="wrap-walls" type="checkbox" />
+          </label>
+        </section>
+
+        <section class="legend" aria-label="操作说明">
+          <h2 class="legend__title">玩法说明</h2>
+          <ul class="legend__list">
+            <li>
+              <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 或 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd
+              ><kbd>D</kbd> 控制方向
+            </li>
+            <li>
+              <kbd>空格</kbd> / <kbd>P</kbd> 开始或暂停，<kbd>R</kbd> / <kbd>Enter</kbd> 重新开始，<kbd>M</kbd> 切换音效
+            </li>
+            <li>移动端可使用下方方向键，或在棋盘上滑动；轻点棋盘可暂停</li>
+            <li>红色果实 +10 分并使蛇变长；金色星星为限时奖励 +50 分</li>
+            <li>每 60 分提升一个等级，速度随之加快</li>
+          </ul>
+        </section>
+      </main>
+
+      <footer class="app__footer">
+        <p>纯前端实现 · 无第三方运行时依赖</p>
+      </footer>
+    </div>
+
+    <p class="visually-hidden" id="live-region" role="status" aria-live="polite"></p>
+
+    <script type="module" src="./src/js/main.js"></script>
+  </body>
+</html>
