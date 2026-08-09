@@ -1,4 +1,4 @@
-import { PLAYER } from './constants.js';
+import { COLUMN_LABELS, PLAYER } from './constants.js';
 
 /**
  * Canvas renderer for {@link import('./gomoku-game.js').GomokuGame}.
@@ -34,7 +34,6 @@ const PALETTE = Object.freeze({
 const MAX_DEVICE_PIXEL_RATIO = 2.5;
 /** Board margin as a multiple of the cell size, with and without labels. */
 const MARGIN_FACTOR = Object.freeze({ withLabels: 1.15, withoutLabels: 0.75 });
-const COLUMN_LABELS = 'ABCDEFGHJKLMNOPQRSTUVWXYZ';
 
 export class GomokuRenderer {
   /** @type {HTMLCanvasElement} */
@@ -412,7 +411,7 @@ export class GomokuRenderer {
 
   /**
    * @param {number} index
-   * @returns {string} Column label, following the go convention of skipping "I".
+   * @returns {string}
    */
   #columnLabel(index) {
     return COLUMN_LABELS[index % COLUMN_LABELS.length];

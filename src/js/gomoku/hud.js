@@ -1,4 +1,4 @@
-import { GOMOKU_STATUS, PLAYER, PLAYER_LABEL } from './constants.js';
+import { COLUMN_LABELS, GOMOKU_STATUS, PLAYER, PLAYER_LABEL } from './constants.js';
 
 /**
  * Keeps the DOM chrome (player cards, turn indicator, record, overlay and
@@ -77,7 +77,7 @@ export class GomokuHud {
    * @returns {string}
    */
   static describeMove(move) {
-    return `${PLAYER_LABEL[move.player]} ${'ABCDEFGHJKLMNOPQRSTUVWXYZ'[move.x]}${move.y + 1}`;
+    return `${PLAYER_LABEL[move.player]} ${COLUMN_LABELS[move.x]}${move.y + 1}`;
   }
 
   /** @param {import('./gomoku-game.js').GomokuGame} game */

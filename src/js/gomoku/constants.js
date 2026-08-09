@@ -24,6 +24,12 @@ export const PLAYER_LABEL = Object.freeze({
   white: '白棋',
 });
 
+/**
+ * Column labels drawn on the board and used in move notation. Unlike go, the
+ * gomoku/renju convention keeps the letter "I".
+ */
+export const COLUMN_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
 /** Lifecycle states of a match. */
 export const GOMOKU_STATUS = Object.freeze({
   PLAYING: 'playing',

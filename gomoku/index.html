@@ -51,11 +51,13 @@
             aria-label="五子棋棋盘，使用方向键移动光标，回车落子"
           ></canvas>
           <div class="overlay" id="overlay" data-status="playing" hidden>
-            <h2 class="overlay__title" id="overlay-title">对局结束</h2>
-            <p class="overlay__message" id="overlay-message"></p>
-            <div class="overlay__actions">
-              <button class="button button--primary" id="overlay-action" type="button">再来一局</button>
-              <button class="button" id="overlay-undo" type="button">撤销这一手</button>
+            <div class="overlay__panel">
+              <h2 class="overlay__title" id="overlay-title">对局结束</h2>
+              <p class="overlay__message" id="overlay-message"></p>
+              <div class="overlay__actions">
+                <button class="button button--primary" id="overlay-action" type="button">再来一局</button>
+                <button class="button" id="overlay-undo" type="button">撤销这一手</button>
+              </div>
             </div>
           </div>
         </div>
