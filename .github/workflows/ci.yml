@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+# Cancel superseded runs on the same ref to keep queues short.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['20.x', '22.x', '24.x']
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      - name: Check formatting (Prettier)
+        run: npm run format:check
+
+      - name: Check static asset references
+        run: npm run check:assets
+
+      - name: Unit tests (Vitest)
+        run: npm test
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Check built asset references
+        run: node scripts/check-assets.mjs --root dist
+
+      - name: Verify build output
+        run: |
+          test -f dist/index.html || { echo "dist/index.html is missing"; exit 1; }
+          test -f dist/.nojekyll || { echo "dist/.nojekyll is missing"; exit 1; }
+          test -f dist/public/favicon.svg || { echo "dist/public/favicon.svg is missing"; exit 1; }
+          test -n "$(find dist/assets -name '*.js' -print -quit)" || { echo "no JS bundle emitted"; exit 1; }
+          test -n "$(find dist/assets -name '*.css' -print -quit)" || { echo "no CSS bundle emitted"; exit 1; }
+          grep -q 'assets/app-' dist/index.html || { echo "index.html was not rewritten to the hashed bundle"; exit 1; }
+
+      - name: Upload build artifact
+        if: matrix.node-version == '22.x'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
