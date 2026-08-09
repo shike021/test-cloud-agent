@@ -1,0 +1,20 @@
+node_modules/
+dist/
+build/
+coverage/
+
+# Runtime data
+*.log
+data/
+*.sqlite
+*.sqlite3
+*.db
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
