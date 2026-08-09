@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { createStorage } from '../src/js/services/storage.js';
+
 /**
- * The storage module resolves its backend once at import time, so every
- * scenario imports a fresh copy through `vi.resetModules()`.
+ * `createStorage` probes the backend once per store, so every scenario stubs
+ * `localStorage` first and creates the store afterwards.
  */
 
 /** @returns {Storage} */
@@ -20,45 +22,41 @@ function createMemoryStorage() {
   });
 }
 
-/** @returns {Promise<typeof import('../src/js/services/storage.js')>} */
-async function importStorage() {
-  vi.resetModules();
-  return import('../src/js/services/storage.js');
-}
-
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('storage — with a working backend', () => {
+describe('createStorage — with a working backend', () => {
   /** @type {Storage} */
   let backend;
+  /** @type {import('../src/js/services/storage.js').NamespacedStorage} */
+  let storage;
 
   beforeEach(() => {
     backend = createMemoryStorage();
     vi.stubGlobal('localStorage', backend);
+    storage = createStorage('snake-game');
   });
 
-  it('round-trips numbers under a namespaced key', async () => {
-    const storage = await importStorage();
+  it('reports that values are persisted', () => {
+    expect(storage.namespace).toBe('snake-game');
+    expect(storage.persistent).toBe(true);
+  });
 
+  it('round-trips numbers under a namespaced key', () => {
     storage.writeNumber('best-score', 1234);
 
     expect(storage.readNumber('best-score')).toBe(1234);
     expect(backend.getItem('snake-game:best-score')).toBe('1234');
   });
 
-  it('truncates non-integer numbers', async () => {
-    const storage = await importStorage();
-
+  it('truncates non-integer numbers', () => {
     storage.writeNumber('best-score', 12.87);
 
     expect(storage.readNumber('best-score')).toBe(12);
   });
 
-  it('round-trips booleans', async () => {
-    const storage = await importStorage();
-
+  it('round-trips booleans', () => {
     storage.writeBoolean('muted', true);
     expect(storage.readBoolean('muted')).toBe(true);
 
@@ -66,9 +64,7 @@ describe('storage — with a working backend', () => {
     expect(storage.readBoolean('muted')).toBe(false);
   });
 
-  it('round-trips strings and validates them against an allow list', async () => {
-    const storage = await importStorage();
-
+  it('round-trips strings and validates them against an allow list', () => {
     storage.writeString('difficulty', 'hard');
     expect(storage.readString('difficulty', 'normal', ['easy', 'normal', 'hard'])).toBe('hard');
 
@@ -76,9 +72,7 @@ describe('storage — with a working backend', () => {
     expect(storage.readString('difficulty', 'normal', ['easy', 'normal', 'hard'])).toBe('normal');
   });
 
-  it('returns the fallback for missing and corrupted values', async () => {
-    const storage = await importStorage();
-
+  it('returns the fallback for missing and corrupted values', () => {
     expect(storage.readNumber('missing', 7)).toBe(7);
     expect(storage.readBoolean('missing', true)).toBe(true);
     expect(storage.readString('missing', 'normal')).toBe('normal');
@@ -86,10 +80,21 @@ describe('storage — with a working backend', () => {
     backend.setItem('snake-game:best-score', 'not-a-number');
     expect(storage.readNumber('best-score', 42)).toBe(42);
   });
+
+  it('isolates stores that use different namespaces', () => {
+    const other = createStorage('gomoku');
+
+    storage.writeNumber('rounds', 3);
+    other.writeNumber('rounds', 11);
+
+    expect(storage.readNumber('rounds')).toBe(3);
+    expect(other.readNumber('rounds')).toBe(11);
+    expect(backend.getItem('gomoku:rounds')).toBe('11');
+  });
 });
 
-describe('storage — with a hostile backend', () => {
-  it('falls back to memory when localStorage throws', async () => {
+describe('createStorage — with a hostile backend', () => {
+  it('falls back to memory when localStorage throws', () => {
     vi.stubGlobal('localStorage', {
       get length() {
         return 0;
@@ -109,19 +114,26 @@ describe('storage — with a hostile backend', () => {
       },
     });
 
-    const storage = await importStorage();
+    const storage = createStorage('snake-game');
 
+    expect(storage.persistent).toBe(false);
     storage.writeNumber('best-score', 99);
     expect(storage.readNumber('best-score')).toBe(99);
   });
 
-  it('works when localStorage is unavailable', async () => {
+  it('works when localStorage is unavailable', () => {
     vi.stubGlobal('localStorage', undefined);
 
-    const storage = await importStorage();
+    const storage = createStorage('snake-game');
 
+    expect(storage.persistent).toBe(false);
     storage.writeBoolean('muted', true);
     expect(storage.readBoolean('muted')).toBe(true);
     expect(storage.readNumber('best-score', 0)).toBe(0);
+  });
+
+  it('rejects an empty namespace', () => {
+    expect(() => createStorage('')).toThrow(TypeError);
+    expect(() => createStorage(undefined)).toThrow(TypeError);
   });
 });

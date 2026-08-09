@@ -1,13 +1,6 @@
 import { FOOD_TYPE, GAME_STATUS } from './core/constants.js';
 import { SnakeGame } from './core/snake-game.js';
-import {
-  readBoolean,
-  readNumber,
-  readString,
-  writeBoolean,
-  writeNumber,
-  writeString,
-} from './services/storage.js';
+import { createStorage } from './services/storage.js';
 import { Hud } from './ui/hud.js';
 import { InputController } from './ui/input-controller.js';
 import { Renderer } from './ui/renderer.js';
@@ -24,6 +17,8 @@ const STORAGE_KEYS = Object.freeze({
   difficulty: 'difficulty',
   wrapWalls: 'wrap-walls',
 });
+
+const storage = createStorage('snake-game');
 
 /** Difficulty presets. Only pacing changes so the board stays comparable. */
 const DIFFICULTIES = Object.freeze({
@@ -77,13 +72,13 @@ function bootstrap() {
 
   const settings = {
     difficulty: /** @type {keyof typeof DIFFICULTIES} */ (
-      readString(STORAGE_KEYS.difficulty, 'normal', DIFFICULTY_NAMES)
+      storage.readString(STORAGE_KEYS.difficulty, 'normal', DIFFICULTY_NAMES)
     ),
-    wrapWalls: readBoolean(STORAGE_KEYS.wrapWalls, false),
+    wrapWalls: storage.readBoolean(STORAGE_KEYS.wrapWalls, false),
   };
 
-  let bestScore = readNumber(STORAGE_KEYS.bestScore, 0);
-  const sound = new SoundPlayer({ muted: readBoolean(STORAGE_KEYS.muted, false) });
+  let bestScore = storage.readNumber(STORAGE_KEYS.bestScore, 0);
+  const sound = new SoundPlayer({ muted: storage.readBoolean(STORAGE_KEYS.muted, false) });
   const hud = new Hud(elements);
 
   let game = createGame(settings);
@@ -170,7 +165,7 @@ function bootstrap() {
   function persistBestScore() {
     if (game.score > bestScore) {
       bestScore = game.score;
-      writeNumber(STORAGE_KEYS.bestScore, bestScore);
+      storage.writeNumber(STORAGE_KEYS.bestScore, bestScore);
     }
   }
 
@@ -238,7 +233,7 @@ function bootstrap() {
 
   function toggleMute() {
     const muted = sound.toggleMuted();
-    writeBoolean(STORAGE_KEYS.muted, muted);
+    storage.writeBoolean(STORAGE_KEYS.muted, muted);
     hud.setMuted(muted);
   }
 
@@ -250,14 +245,14 @@ function bootstrap() {
   elements.difficultySelect.addEventListener('change', (event) => {
     const value = normaliseDifficulty(/** @type {HTMLSelectElement} */ (event.target).value);
     settings.difficulty = value;
-    writeString(STORAGE_KEYS.difficulty, value);
+    storage.writeString(STORAGE_KEYS.difficulty, value);
     rebuildGame();
     hud.announce('难度已切换，新的一局已准备好。');
   });
 
   elements.wrapWallsToggle.addEventListener('change', (event) => {
     settings.wrapWalls = /** @type {HTMLInputElement} */ (event.target).checked;
-    writeBoolean(STORAGE_KEYS.wrapWalls, settings.wrapWalls);
+    storage.writeBoolean(STORAGE_KEYS.wrapWalls, settings.wrapWalls);
     rebuildGame();
     hud.announce(settings.wrapWalls ? '穿墙模式已开启。' : '穿墙模式已关闭。');
   });
