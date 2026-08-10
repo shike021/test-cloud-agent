@@ -1,32 +1,33 @@
 {
-  "name": "test-cloud-agent",
-  "version": "1.0.0",
+  "name": "web-arcade",
+  "version": "1.1.0",
   "private": true,
+  "description": "生产级纯前端小游戏合集：贪吃蛇与 15×15 双人五子棋，含游戏大厅、多页构建与 GitHub Pages 部署。",
   "type": "module",
-  "description": "Full-stack task manager used to validate the Cloud Agent development environment.",
-  "workspaces": [
-    "packages/server",
-    "packages/web"
-  ],
+  "license": "MIT",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.10.0"
   },
   "scripts": {
-    "dev": "npm-run-all --parallel dev:server dev:web",
-    "dev:server": "npm run dev --workspace @app/server",
-    "dev:web": "npm run dev --workspace @app/web",
-    "build": "npm run build --workspace @app/server && npm run build --workspace @app/web",
-    "start": "npm run start --workspace @app/server",
-    "lint": "npm run lint --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "dev": "node scripts/dev-server.mjs",
+    "build": "node scripts/build.mjs",
+    "preview": "node scripts/dev-server.mjs --root dist",
+    "check:assets": "node scripts/check-assets.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verify": "npm run lint && npm run format:check && npm run check:assets && npm run test && npm run build"
   },
   "devDependencies": {
-    "@eslint/js": "^9.18.0",
-    "eslint": "^9.18.0",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "globals": "^15.14.0",
-    "npm-run-all2": "^7.0.2",
-    "typescript-eslint": "^8.20.0"
+    "@eslint/js": "^10.0.1",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.8.1",
+    "globals": "^17.9.0",
+    "jsdom": "^30.0.1",
+    "prettier": "^3.9.6",
+    "vitest": "^4.1.10"
   }
 }

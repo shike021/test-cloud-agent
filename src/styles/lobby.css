@@ -1,0 +1,171 @@
+/* ==========================================================================
+   Web Arcade — lobby stylesheet
+   Layout: one card per row on small screens, two columns from 720px up.
+   ========================================================================== */
+
+@import './base.css';
+
+.lobby {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.85rem, 2vw, 1.5rem);
+}
+
+.lobby__grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 720px) {
+  .lobby__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* -------------------------------------------------------------------- card */
+
+.card {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'art body'
+    'cta cta';
+  align-items: start;
+  gap: 0.85rem;
+  padding: clamp(1rem, 2.4vw, 1.35rem);
+  color: inherit;
+  text-decoration: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-panel);
+  backdrop-filter: blur(10px);
+  transition:
+    transform var(--transition),
+    border-color var(--transition),
+    background var(--transition);
+}
+
+.card:hover,
+.card:focus-visible {
+  transform: translateY(-2px);
+  background: rgba(28, 44, 72, 0.82);
+  border-color: rgba(148, 197, 255, 0.34);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+.card:active {
+  transform: translateY(0);
+}
+
+.card__shortcut {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.85rem;
+  min-width: 1.6em;
+  padding: 0.05em 0.4em;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  background: rgba(9, 16, 30, 0.9);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.card__art {
+  grid-area: art;
+  width: clamp(52px, 12vw, 68px);
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  padding: 0.55rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.card__art svg {
+  width: 100%;
+  height: 100%;
+}
+
+.card__art--snake {
+  color: var(--color-primary);
+  background: radial-gradient(circle at 30% 20%, rgba(55, 214, 122, 0.28), rgba(9, 16, 30, 0.85));
+}
+
+.card__art--gomoku {
+  color: #e8c08d;
+  background: radial-gradient(circle at 30% 20%, rgba(232, 192, 141, 0.28), rgba(9, 16, 30, 0.85));
+}
+
+.card__body {
+  grid-area: body;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.card__title {
+  font-size: clamp(1.05rem, 3.4vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.card__description {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.tag {
+  padding: 0.1rem 0.5rem;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  background: rgba(9, 16, 30, 0.75);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+}
+
+.card__stat {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+.card__cta {
+  grid-area: cta;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.card:hover .card__cta span,
+.card:focus-visible .card__cta span {
+  transform: translateX(3px);
+}
+
+.card__cta span {
+  transition: transform var(--transition);
+}

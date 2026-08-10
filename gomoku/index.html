@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1220" />
+    <meta name="description" content="15×15 双人同机五子棋：点击或键盘落子，支持撤销、交替先手、战绩统计与坐标显示。" />
+    <title>五子棋 · Gomoku</title>
+    <link rel="icon" href="../public/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../src/styles/gomoku.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app__header app__header--game">
+        <a class="app__back" href="../index.html">
+          <span aria-hidden="true">←</span>
+          游戏大厅
+        </a>
+        <div class="app__heading">
+          <h1 class="app__title">五子棋</h1>
+          <p class="app__tagline">15×15 双人同机 · 点击落子 · U 撤销 · N 新局</p>
+        </div>
+      </header>
+
+      <main class="match">
+        <section class="players" aria-label="对局状态">
+          <article class="player" id="player-black" data-player="black">
+            <span class="player__stone player__stone--black" aria-hidden="true"></span>
+            <span class="player__name">黑棋</span>
+            <span class="player__record"><output id="black-wins">0</output> 胜</span>
+          </article>
+
+          <div class="players__center">
+            <output class="players__turn" id="turn-label">黑棋回合</output>
+            <p class="players__meta">第 <output id="move-count">0</output> 手 · 和棋 <output id="draws">0</output></p>
+          </div>
+
+          <article class="player player--white" id="player-white" data-player="white">
+            <span class="player__stone player__stone--white" aria-hidden="true"></span>
+            <span class="player__name">白棋</span>
+            <span class="player__record"><output id="white-wins">0</output> 胜</span>
+          </article>
+        </section>
+
+        <div class="board board--gomoku" id="board-frame">
+          <canvas
+            id="board"
+            class="board__canvas"
+            tabindex="0"
+            role="application"
+            aria-label="五子棋棋盘，使用方向键移动光标，回车落子"
+          ></canvas>
+          <div class="overlay" id="overlay" data-status="playing" hidden>
+            <div class="overlay__panel">
+              <h2 class="overlay__title" id="overlay-title">对局结束</h2>
+              <p class="overlay__message" id="overlay-message"></p>
+              <div class="overlay__actions">
+                <button class="button button--primary" id="overlay-action" type="button">再来一局</button>
+                <button class="button" id="overlay-undo" type="button">撤销这一手</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="button button--primary" id="restart" type="button">新局 (N)</button>
+          <button class="button" id="undo" type="button">撤销 (U)</button>
+          <button class="button" id="reset-record" type="button">清空战绩</button>
+          <button
+            class="button button--icon"
+            id="mute"
+            type="button"
+            aria-pressed="true"
+            data-state="unmuted"
+            title="关闭音效 (M)"
+          >
+            <svg
+              class="button__icon button__icon--audible"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M11 5 6 9H3v6h3l5 4z" />
+              <path d="M16 9a4 4 0 0 1 0 6" />
+              <path d="M19 6a8 8 0 0 1 0 12" />
+            </svg>
+            <svg
+              class="button__icon button__icon--muted"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M11 5 6 9H3v6h3l5 4z" />
+              <path d="m17 9 5 6" />
+              <path d="m22 9-5 6" />
+            </svg>
+            <span data-label>音效开</span>
+          </button>
+        </div>
+
+        <section class="settings" aria-label="对局设置">
+          <label class="settings__field settings__field--switch" for="show-coordinates">
+            <span>显示坐标</span>
+            <input class="settings__checkbox" id="show-coordinates" type="checkbox" checked />
+          </label>
+          <label class="settings__field settings__field--switch" for="show-last-move">
+            <span>标记最后一手</span>
+            <input class="settings__checkbox" id="show-last-move" type="checkbox" checked />
+          </label>
+          <label class="settings__field settings__field--switch" for="alternate-first">
+            <span>交替先手</span>
+            <input class="settings__checkbox" id="alternate-first" type="checkbox" checked />
+          </label>
+        </section>
+
+        <section class="legend" aria-label="玩法说明">
+          <h2 class="legend__title">玩法说明</h2>
+          <ul class="legend__list">
+            <li>黑白双方轮流在交叉点落子，先在横、竖或斜方向连成五子者获胜。</li>
+            <li>采用无禁手规则：连成五子及以上即算胜利，落子没有位置限制。</li>
+            <li>
+              鼠标或手指点击交叉点落子；聚焦棋盘后可用 <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 移动光标，<kbd
+                >Enter</kbd
+              >
+              落子。
+            </li>
+            <li><kbd>N</kbd> 开新局，<kbd>U</kbd> / <kbd>Z</kbd> 撤销上一手，<kbd>M</kbd> 切换音效。</li>
+            <li>红圈标记最后一手，胜局会高亮连成的五子；战绩与设置保存在本地。</li>
+          </ul>
+        </section>
+      </main>
+
+      <footer class="app__footer">
+        <p>纯前端实现 · 无第三方运行时依赖</p>
+      </footer>
+    </div>
+
+    <p class="visually-hidden" id="live-region" role="status" aria-live="polite"></p>
+
+    <script type="module" src="../src/js/gomoku/main.js"></script>
+  </body>
+</html>

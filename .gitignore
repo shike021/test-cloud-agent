@@ -12,21 +12,22 @@ data/
 *.sqlite3
 *.db
 
+# Test coverage
+coverage/
+
 # Logs
 logs/
 *.log
 npm-debug.log*
 
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Editor / OS
+# Editor / OS noise
 .DS_Store
 .idea/
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 *.swp
 
-# Test coverage
-coverage/
+# Local environment files (never commit secrets)
+.env
+.env.*
+!.env.example

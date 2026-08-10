@@ -3,18 +3,10 @@
   "install": "npm ci",
   "terminals": [
     {
-      "name": "api",
-      "command": "npm run dev:server",
-      "description": "Express + SQLite REST API with hot reload on http://localhost:4000 (health: /api/health)."
-    },
-    {
-      "name": "web",
-      "command": "npm run dev:web",
-      "description": "React + Vite dev server on http://localhost:5173, proxies /api to the API terminal."
+      "name": "arcade",
+      "command": "npm run dev",
+      "description": "Static dev server for the game collection on http://127.0.0.1:5173 (lobby, /snake/, /gomoku/)."
     }
   ],
-  "ports": [
-    { "name": "api", "port": 4000 },
-    { "name": "web", "port": 5173 }
-  ]
+  "ports": [{ "name": "arcade", "port": 5173 }]
 }

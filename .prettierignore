@@ -1,0 +1,7 @@
+dist/
+coverage/
+node_modules/
+package-lock.json
+
+# Self-contained npm project with its own tooling.
+task-manager/

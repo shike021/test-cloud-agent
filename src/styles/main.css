@@ -1,0 +1,115 @@
+/* ==========================================================================
+   贪吃蛇 · Snake — page stylesheet
+   Layout: single column on small screens, board + side panel from 900px up.
+   ========================================================================== */
+
+@import './base.css';
+
+.game {
+  display: grid;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  grid-template-areas:
+    'scoreboard'
+    'board'
+    'dpad'
+    'controls'
+    'settings'
+    'legend';
+  justify-items: center;
+}
+
+.scoreboard {
+  grid-area: scoreboard;
+}
+.board {
+  grid-area: board;
+}
+.dpad {
+  grid-area: dpad;
+}
+.controls {
+  grid-area: controls;
+}
+.settings {
+  grid-area: settings;
+}
+.legend {
+  grid-area: legend;
+}
+
+@media (min-width: 900px) {
+  .game {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-areas:
+      'board scoreboard'
+      'board controls'
+      'board settings'
+      'board legend';
+    align-content: start;
+    justify-items: stretch;
+  }
+
+  .board {
+    align-self: start;
+  }
+}
+
+/* -------------------------------------------------------------------- dpad */
+
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 62px);
+  grid-template-rows: repeat(3, 62px);
+  gap: 0.4rem;
+  justify-content: center;
+}
+
+.dpad__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background var(--transition),
+    transform var(--transition);
+}
+
+.dpad__button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.dpad__button:active {
+  background: linear-gradient(120deg, var(--color-primary), var(--color-primary-strong));
+  color: #06251a;
+  transform: scale(0.95);
+}
+
+.dpad__button--up {
+  grid-area: 1 / 2;
+}
+.dpad__button--left {
+  grid-area: 2 / 1;
+}
+.dpad__button--right {
+  grid-area: 2 / 3;
+}
+.dpad__button--down {
+  grid-area: 3 / 2;
+}
+
+/* Declared after the base rules so it wins on source order. Pointer-based
+   players do not need the on-screen pad. */
+@media (min-width: 900px) {
+  .dpad {
+    display: none;
+  }
+}
