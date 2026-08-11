@@ -1,0 +1,233 @@
+/* ==========================================================================
+   2048 · 数字合成 — page stylesheet
+   Layout: single column on small screens, board + side panel from 900px up.
+   The board geometry is pure CSS: cells and tiles are sized from `--grid-size`
+   and `--grid-gap`, so the renderer only writes the cell coordinates of a tile.
+   ========================================================================== */
+
+@import './base.css';
+
+.game2048 {
+  display: grid;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  grid-template-areas:
+    'scoreboard'
+    'board'
+    'dpad'
+    'controls'
+    'legend';
+  justify-items: center;
+}
+
+.scoreboard {
+  grid-area: scoreboard;
+}
+.board {
+  grid-area: board;
+}
+.dpad {
+  grid-area: dpad;
+}
+.controls {
+  grid-area: controls;
+}
+.legend {
+  grid-area: legend;
+}
+
+@media (min-width: 900px) {
+  .game2048 {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-areas:
+      'board scoreboard'
+      'board controls'
+      'board legend';
+    align-content: start;
+    justify-items: stretch;
+  }
+
+  .board {
+    align-self: start;
+  }
+}
+
+/* ------------------------------------------------------------------- board */
+
+.board--2048 {
+  --grid-size: 4;
+  --board-padding: clamp(7px, 1.8vw, 14px);
+  --grid-gap: clamp(7px, 1.8vw, 14px);
+  --tile-slide: 130ms;
+  --tile-radius: clamp(6px, 1.6vw, 12px);
+
+  padding: var(--board-padding);
+  background: linear-gradient(180deg, rgba(16, 27, 46, 0.96), rgba(10, 18, 32, 0.96));
+}
+
+.board__grid,
+.board__tiles {
+  position: absolute;
+  inset: var(--board-padding);
+}
+
+.board__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-size), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--grid-size), minmax(0, 1fr));
+  gap: var(--grid-gap);
+}
+
+.board__cell {
+  border-radius: var(--tile-radius);
+  background: rgba(148, 197, 255, 0.07);
+}
+
+/* The tile layer is a size container, which lets the tile labels scale with
+   the board instead of with the viewport. */
+.board__tiles {
+  container-type: size;
+}
+
+/* -------------------------------------------------------------------- tile */
+
+.tile {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: calc((100% - (var(--grid-size) - 1) * var(--grid-gap)) / var(--grid-size));
+  height: calc((100% - (var(--grid-size) - 1) * var(--grid-gap)) / var(--grid-size));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 8cqw;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  /* Values beyond 2048 keep this treatment; the lower tiles override it. */
+  color: #fff6dd;
+  background: linear-gradient(140deg, #6c3bd6, #34206f);
+  border-radius: var(--tile-radius);
+  box-shadow: 0 6px 16px rgba(2, 8, 20, 0.45);
+  /* Percentages resolve against the tile itself, which is exactly one cell
+     wide and tall, so one step is `100% + gap`. */
+  translate: calc(var(--tile-x, 0) * (100% + var(--grid-gap)))
+    calc(var(--tile-y, 0) * (100% + var(--grid-gap)));
+  transition: translate var(--tile-slide) cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.tile[data-digits='3'] {
+  font-size: 7cqw;
+}
+.tile[data-digits='4'] {
+  font-size: 6cqw;
+}
+.tile[data-digits='5'] {
+  font-size: 4.8cqw;
+}
+.tile[data-digits='6'] {
+  font-size: 4cqw;
+}
+
+.tile[data-value='2'] {
+  color: #0b1626;
+  background: linear-gradient(140deg, #e9f1ff, #c3d3ea);
+}
+.tile[data-value='4'] {
+  color: #0b1626;
+  background: linear-gradient(140deg, #ffe9b8, #f3cf85);
+}
+.tile[data-value='8'] {
+  color: #0b1626;
+  background: linear-gradient(140deg, #ffc98a, #f7a45c);
+}
+.tile[data-value='16'] {
+  color: #12060a;
+  background: linear-gradient(140deg, #ff9f7a, #f2734a);
+}
+.tile[data-value='32'] {
+  color: #fff3f3;
+  background: linear-gradient(140deg, #ff7d6b, #e2503f);
+}
+.tile[data-value='64'] {
+  color: #fff3f3;
+  background: linear-gradient(140deg, #ff5d73, #c62f4d);
+}
+.tile[data-value='128'] {
+  color: #04231a;
+  background: linear-gradient(140deg, #7ff0b2, #37d67a);
+}
+.tile[data-value='256'] {
+  color: #04231a;
+  background: linear-gradient(140deg, #57e6a5, #17b981);
+}
+.tile[data-value='512'] {
+  color: #032027;
+  background: linear-gradient(140deg, #62e3f5, #12a8c8);
+}
+.tile[data-value='1024'] {
+  color: #f2f8ff;
+  background: linear-gradient(140deg, #4aa8ff, #1f62d8);
+}
+.tile[data-value='2048'] {
+  color: #2a1a00;
+  background: linear-gradient(140deg, #ffe27a, #ffb200);
+  box-shadow:
+    0 0 0 1px rgba(255, 226, 122, 0.65),
+    0 8px 22px rgba(255, 178, 0, 0.35);
+}
+
+/* A tile that just appeared, and the one a merge produced, stay invisible for
+   the duration of the slide so they never overtake the tiles moving in. */
+.tile--new {
+  animation: tile-appear 180ms cubic-bezier(0.33, 1, 0.68, 1) var(--tile-slide) backwards;
+}
+
+.tile--merged {
+  z-index: 2;
+  animation: tile-pop 220ms cubic-bezier(0.33, 1, 0.68, 1) var(--tile-slide) backwards;
+}
+
+/* Consumed by a merge: it slides under the merged tile and is then dropped. */
+.tile--retiring {
+  z-index: 0;
+}
+
+@keyframes tile-appear {
+  from {
+    opacity: 0;
+    scale: 0.3;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes tile-pop {
+  0% {
+    scale: 0;
+  }
+  60% {
+    scale: 1.14;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board--2048 {
+    --tile-slide: 0ms;
+  }
+}
+
+/* ----------------------------------------------------------------- overlay */
+
+/* The board stays readable behind the result card, so the layer only dims it
+   slightly instead of blurring it away. */
+.board--2048 .overlay {
+  padding: clamp(0.6rem, 2.5vw, 1rem);
+  background: linear-gradient(180deg, rgba(7, 12, 23, 0.55), rgba(7, 12, 23, 0.8));
+}

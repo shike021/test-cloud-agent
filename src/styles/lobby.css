@@ -1,6 +1,7 @@
 /* ==========================================================================
    Web Arcade — lobby stylesheet
-   Layout: one card per row on small screens, two columns from 720px up.
+   Layout: one card per row on small screens, two columns from 720px up and
+   three from 1000px up, where the shell reaches its maximum width.
    ========================================================================== */
 
 @import './base.css';
@@ -23,6 +24,12 @@
 @media (min-width: 720px) {
   .lobby__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1000px) {
+  .lobby__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -107,6 +114,11 @@
 .card__art--gomoku {
   color: #e8c08d;
   background: radial-gradient(circle at 30% 20%, rgba(232, 192, 141, 0.28), rgba(9, 16, 30, 0.85));
+}
+
+.card__art--2048 {
+  color: #ffb200;
+  background: radial-gradient(circle at 30% 20%, rgba(255, 178, 0, 0.28), rgba(9, 16, 30, 0.85));
 }
 
 .card__body {

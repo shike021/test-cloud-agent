@@ -22,7 +22,12 @@ import { fileURLToPath } from 'node:url';
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 /** Every HTML entry point of the arcade, relative to the checked root. */
-const ENTRY_PAGES = Object.freeze(['index.html', 'snake/index.html', 'gomoku/index.html']);
+const ENTRY_PAGES = Object.freeze([
+  'index.html',
+  'snake/index.html',
+  'gomoku/index.html',
+  '2048/index.html',
+]);
 
 const HTML_REFERENCE_PATTERN = /(?:href|src)\s*=\s*"([^"]+)"/g;
 const IMPORT_PATTERN =

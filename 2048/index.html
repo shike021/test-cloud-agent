@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1220" />
+    <meta
+      name="description"
+      content="经典 4×4 数字合成游戏 2048：方向键、WASD 或滑动操作，相同数字合并计分，达成 2048 后可继续挑战。"
+    />
+    <title>2048 · 数字合成</title>
+    <link rel="icon" href="../public/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../src/styles/game2048.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app__header app__header--game">
+        <a class="app__back" href="../index.html">
+          <span aria-hidden="true">←</span>
+          游戏大厅
+        </a>
+        <div class="app__heading">
+          <h1 class="app__title">2048</h1>
+          <p class="app__tagline">方向键 / WASD / 滑动 · R 重开 · 达成 2048 后按 C 继续</p>
+        </div>
+      </header>
+
+      <main class="game2048">
+        <section class="scoreboard" aria-label="计分板">
+          <div class="stat">
+            <span class="stat__label">得分</span>
+            <output class="stat__value" id="score">0</output>
+          </div>
+          <div class="stat">
+            <span class="stat__label">最高分</span>
+            <output class="stat__value" id="best-score">0</output>
+          </div>
+          <div class="stat">
+            <span class="stat__label">最大方块</span>
+            <output class="stat__value" id="largest-tile">0</output>
+          </div>
+          <div class="stat">
+            <span class="stat__label">步数</span>
+            <output class="stat__value" id="move-count">0</output>
+          </div>
+        </section>
+
+        <div class="board board--2048" id="board-frame">
+          <div class="board__grid" id="grid" aria-hidden="true"></div>
+          <div class="board__tiles" id="tiles" aria-hidden="true"></div>
+          <div class="overlay" id="overlay" data-status="playing" hidden>
+            <div class="overlay__panel">
+              <h2 class="overlay__title" id="overlay-title">游戏结束</h2>
+              <p class="overlay__message" id="overlay-message"></p>
+              <div class="overlay__actions">
+                <button class="button button--primary" id="overlay-continue" type="button" hidden>继续挑战 (C)</button>
+                <button class="button" id="overlay-restart" type="button">再来一局 (R)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="visually-hidden" id="board-summary"></p>
+
+        <div class="dpad" id="dpad" role="group" aria-label="方向控制">
+          <button class="dpad__button dpad__button--up" type="button" data-direction="up" aria-label="向上">
+            <span aria-hidden="true">▲</span>
+          </button>
+          <button class="dpad__button dpad__button--left" type="button" data-direction="left" aria-label="向左">
+            <span aria-hidden="true">◀</span>
+          </button>
+          <button class="dpad__button dpad__button--right" type="button" data-direction="right" aria-label="向右">
+            <span aria-hidden="true">▶</span>
+          </button>
+          <button class="dpad__button dpad__button--down" type="button" data-direction="down" aria-label="向下">
+            <span aria-hidden="true">▼</span>
+          </button>
+        </div>
+
+        <div class="controls">
+          <button class="button button--primary" id="restart" type="button">新游戏 (R)</button>
+        </div>
+
+        <section class="legend" aria-label="玩法说明">
+          <h2 class="legend__title">玩法说明</h2>
+          <ul class="legend__list">
+            <li>
+              <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd> 或 <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd
+              ><kbd>D</kbd> 让所有方块朝该方向滑动；移动端可直接在棋盘上滑动，或使用上方方向键。
+            </li>
+            <li>两个数字相同的方块相撞会合并成它们的和，并把这个和计入得分；同一个方块在一次移动中只会合并一次。</li>
+            <li>每次成功移动后，会在空格中随机出现一个新的 <strong>2</strong>（10% 的概率是 <strong>4</strong>）。</li>
+            <li>合成 <strong>2048</strong> 即为胜利，可按 <kbd>C</kbd> / <kbd>空格</kbd> 继续挑战更大的方块。</li>
+            <li>棋盘填满且四个方向都无法移动时本局结束；<kbd>R</kbd> 随时开始新的一局。</li>
+            <li>最高分保存在浏览器本地，隐私模式下自动降级为内存存储。</li>
+          </ul>
+        </section>
+      </main>
+
+      <footer class="app__footer">
+        <p>纯前端实现 · 无第三方运行时依赖</p>
+      </footer>
+    </div>
+
+    <p class="visually-hidden" id="live-region" role="status" aria-live="polite"></p>
+
+    <script type="module" src="../src/js/game2048/main.js"></script>
+  </body>
+</html>
