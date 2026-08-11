@@ -25,8 +25,8 @@ export class Game2048Renderer {
   #game;
   /** @type {Map<number, HTMLElement>} */
   #elements = new Map();
-  /** @type {Set<ReturnType<typeof setTimeout>>} */
-  #timers = new Set();
+  /** @type {Map<HTMLElement, ReturnType<typeof setTimeout>>} Tiles on their way out. */
+  #retiring = new Map();
 
   /**
    * @param {object} elements
@@ -82,10 +82,7 @@ export class Game2048Renderer {
 
   /** Removes every tile immediately, cancelling pending clean-ups. */
   clear() {
-    for (const timer of this.#timers) {
-      clearTimeout(timer);
-    }
-    this.#timers.clear();
+    this.#flushRetiring();
     this.#elements.clear();
     this.#tileLayer.replaceChildren();
   }
@@ -98,6 +95,9 @@ export class Game2048Renderer {
   /* --------------------------------------------------------------- helpers */
 
   #retireMergedTiles() {
+    // A new board supersedes whatever the previous move was still animating.
+    this.#flushRetiring();
+
     for (const tile of this.#game.removedTiles) {
       const element = this.#elements.get(tile.id);
       if (!element) {
@@ -108,12 +108,23 @@ export class Game2048Renderer {
       element.classList.add('tile--retiring');
       this.#position(element, tile.x, tile.y);
 
-      const timer = setTimeout(() => {
-        this.#timers.delete(timer);
-        element.remove();
-      }, RETIRE_DELAY_MS);
-      this.#timers.add(timer);
+      this.#retiring.set(
+        element,
+        setTimeout(() => {
+          this.#retiring.delete(element);
+          element.remove();
+        }, RETIRE_DELAY_MS),
+      );
     }
+  }
+
+  /** Drops the tiles that are still animating out, without waiting. */
+  #flushRetiring() {
+    for (const [element, timer] of this.#retiring) {
+      clearTimeout(timer);
+      element.remove();
+    }
+    this.#retiring.clear();
   }
 
   /** @param {Tile} tile */

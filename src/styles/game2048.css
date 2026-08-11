@@ -35,6 +35,12 @@
   grid-area: legend;
 }
 
+/* Scores here run into five and six digits, so the values need a little more
+   room than the three-digit scores of the other games. */
+.game2048 .stat__value {
+  font-size: clamp(1rem, 3vw, 1.3rem);
+}
+
 @media (min-width: 900px) {
   .game2048 {
     grid-template-columns: minmax(0, 1fr) 300px;
@@ -48,6 +54,11 @@
 
   .board {
     align-self: start;
+  }
+
+  /* Four columns of long numbers do not fit the 300px side panel. */
+  .game2048 .scoreboard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -228,6 +239,8 @@
 /* The board stays readable behind the result card, so the layer only dims it
    slightly instead of blurring it away. */
 .board--2048 .overlay {
+  /* The tiles are stacked, so the result card needs a layer of its own. */
+  z-index: 3;
   padding: clamp(0.6rem, 2.5vw, 1rem);
   background: linear-gradient(180deg, rgba(7, 12, 23, 0.55), rgba(7, 12, 23, 0.8));
 }
