@@ -1,5 +1,7 @@
 # Web Arcade · 纯前端小游戏合集
 
+简体中文 · [English](./README_en.md) · [日本語](./README_jp.md)
+
 一套零运行时依赖的纯前端小游戏合集：**游戏大厅 + 贪吃蛇 + 五子棋**。规则被封装在可单元测试的核心模块里，桌面与移动端都能直接玩。
 
 [![CI](https://github.com/shike021/test-cloud-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/shike021/test-cloud-agent/actions/workflows/ci.yml)
