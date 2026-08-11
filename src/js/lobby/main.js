@@ -36,6 +36,15 @@ function showGomokuProgress() {
   targets.draws.textContent = String(Math.max(0, storage.readNumber('draws', 0)));
 }
 
+function showGame2048Progress() {
+  const output = document.querySelector('#game2048-best');
+  if (!output) {
+    return;
+  }
+  const storage = createStorage('game-2048');
+  output.textContent = String(Math.max(0, storage.readNumber('best-score', 0)));
+}
+
 function bindShortcuts() {
   /** @type {Map<string, HTMLAnchorElement>} */
   const shortcuts = new Map();
@@ -64,6 +73,7 @@ function bindShortcuts() {
 function bootstrap() {
   showSnakeProgress();
   showGomokuProgress();
+  showGame2048Progress();
   bindShortcuts();
 }
 

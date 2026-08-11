@@ -45,6 +45,12 @@ const PAGES = Object.freeze([
     script: 'src/js/gomoku/main.js',
     style: 'src/styles/gomoku.css',
   },
+  {
+    name: 'game2048',
+    html: '2048/index.html',
+    script: 'src/js/game2048/main.js',
+    style: 'src/styles/game2048.css',
+  },
 ]);
 
 /**

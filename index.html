@@ -4,7 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0b1220" />
-    <meta name="description" content="纯前端小游戏合集：贪吃蛇与五子棋，无第三方运行时依赖，桌面与移动端均可畅玩。" />
+    <meta
+      name="description"
+      content="纯前端小游戏合集：贪吃蛇、五子棋与 2048，无第三方运行时依赖，桌面与移动端均可畅玩。"
+    />
     <title>Web Arcade · 小游戏合集</title>
     <link rel="icon" href="./public/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./src/styles/lobby.css" />
@@ -83,13 +86,49 @@
               </span>
             </a>
           </li>
+
+          <li>
+            <a class="card" href="./2048/index.html" data-shortcut="Digit3">
+              <span class="card__shortcut" aria-hidden="true">3</span>
+              <span class="card__art card__art--2048" aria-hidden="true">
+                <svg viewBox="0 0 64 64" fill="none">
+                  <rect x="8" y="8" width="22" height="22" rx="5" fill="#e9f1ff" />
+                  <rect x="34" y="8" width="22" height="22" rx="5" fill="#ffe9b8" />
+                  <rect x="8" y="34" width="22" height="22" rx="5" fill="#ffc98a" />
+                  <rect x="34" y="34" width="22" height="22" rx="5" fill="#ffb200" />
+                  <g fill="#11203a" font-family="monospace" font-size="12" font-weight="700" text-anchor="middle">
+                    <text x="19" y="24">2</text>
+                    <text x="45" y="24">4</text>
+                    <text x="19" y="50">8</text>
+                    <text x="45" y="50">16</text>
+                  </g>
+                </svg>
+              </span>
+              <span class="card__body">
+                <span class="card__title">2048</span>
+                <span class="card__description">
+                  经典 4×4 数字合成：相同数字合并计分，达成 2048 后还能继续挑战更大的方块。
+                </span>
+                <span class="card__tags">
+                  <span class="tag">单人</span>
+                  <span class="tag">键盘 / 滑动</span>
+                  <span class="tag">DOM</span>
+                </span>
+                <span class="card__stat">最高分 <output id="game2048-best">0</output></span>
+              </span>
+              <span class="card__cta">
+                开始挑战
+                <span aria-hidden="true">→</span>
+              </span>
+            </a>
+          </li>
         </ul>
 
         <section class="legend" aria-label="使用说明">
           <h2 class="legend__title">说明</h2>
           <ul class="legend__list">
-            <li>按 <kbd>1</kbd> / <kbd>2</kbd> 可直接进入对应游戏。</li>
-            <li>两款游戏均为原生 HTML / CSS / ES Modules 实现，规则逻辑与渲染完全解耦。</li>
+            <li>按 <kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> 可直接进入对应游戏。</li>
+            <li>三款游戏均为原生 HTML / CSS / ES Modules 实现，规则逻辑与渲染完全解耦。</li>
             <li>最高分、战绩与偏好设置保存在浏览器本地，隐私模式下自动降级为内存存储。</li>
           </ul>
         </section>
