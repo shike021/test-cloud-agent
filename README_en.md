@@ -1,5 +1,7 @@
 # Web Arcade · A Collection of Browser Games
 
+[简体中文](./README.md) · English · [日本語](./README_jp.md)
+
 A collection of browser games with zero runtime dependencies: **Game Lobby + Snake + Gomoku**. The rules are encapsulated in unit-testable core modules, and the games are ready to play on both desktop and mobile devices.
 
 [![CI](https://github.com/shike021/test-cloud-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/shike021/test-cloud-agent/actions/workflows/ci.yml)
