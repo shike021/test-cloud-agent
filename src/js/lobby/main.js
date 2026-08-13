@@ -45,6 +45,15 @@ function showGame2048Progress() {
   output.textContent = String(Math.max(0, storage.readNumber('best-score', 0)));
 }
 
+function showLianliankanProgress() {
+  const output = document.querySelector('#lianliankan-best');
+  if (!output) {
+    return;
+  }
+  const storage = createStorage('lianliankan');
+  output.textContent = String(Math.max(0, storage.readNumber('best-score', 0)));
+}
+
 function bindShortcuts() {
   /** @type {Map<string, HTMLAnchorElement>} */
   const shortcuts = new Map();
@@ -74,6 +83,7 @@ function bootstrap() {
   showSnakeProgress();
   showGomokuProgress();
   showGame2048Progress();
+  showLianliankanProgress();
   bindShortcuts();
 }
 

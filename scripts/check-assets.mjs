@@ -27,6 +27,7 @@ const ENTRY_PAGES = Object.freeze([
   'snake/index.html',
   'gomoku/index.html',
   '2048/index.html',
+  'lianliankan/index.html',
 ]);
 
 const HTML_REFERENCE_PATTERN = /(?:href|src)\s*=\s*"([^"]+)"/g;

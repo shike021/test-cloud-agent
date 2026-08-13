@@ -2,7 +2,7 @@
 
 [简体中文](./README.md) · English · [日本語](./README_jp.md) · [Español](./README_es.md)
 
-A collection of browser games with zero runtime dependencies: **Game Lobby + Snake + Gomoku + 2048**. The rules are encapsulated in unit-testable core modules, and the games are ready to play on both desktop and mobile devices.
+A collection of browser games with zero runtime dependencies: **Game Lobby + Snake + Gomoku + 2048 + Link Match**. The rules are encapsulated in unit-testable core modules, and the games are ready to play on both desktop and mobile devices.
 
 [![CI](https://github.com/shike021/test-cloud-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/shike021/test-cloud-agent/actions/workflows/ci.yml)
 [![Deploy to GitHub Pages](https://github.com/shike021/test-cloud-agent/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/shike021/test-cloud-agent/actions/workflows/deploy-pages.yml)
@@ -26,14 +26,15 @@ Run `npm run build` to create a distributable static site in `dist/`. Use `npm r
 
 ## Page Routes
 
-| Route      | Page       | Description                                                              |
-| ---------- | ---------- | ------------------------------------------------------------------------ |
-| `/`        | Game Lobby | Card-based navigation with locally saved high scores and match stats     |
-| `/snake/`  | Snake      | Single-player; keyboard, on-screen directional pad, or swipe gestures    |
-| `/gomoku/` | Gomoku     | Local two-player game on a 15×15 board; mouse, touch, or keyboard cursor |
-| `/2048/`   | 2048       | Single-player 4×4 number merging; keyboard, directional pad, or swipes   |
+| Route           | Page       | Description                                                              |
+| --------------- | ---------- | ------------------------------------------------------------------------ |
+| `/`             | Game Lobby | Card-based navigation with locally saved high scores and match stats     |
+| `/snake/`       | Snake      | Single-player; keyboard, on-screen directional pad, or swipe gestures    |
+| `/gomoku/`      | Gomoku     | Local two-player game on a 15×15 board; mouse, touch, or keyboard cursor |
+| `/2048/`        | 2048       | Single-player 4×4 number merging; keyboard, directional pad, or swipes   |
+| `/lianliankan/` | Link Match | Single-player tile matching with at most two turns and rising difficulty |
 
-Press <kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> in the lobby to jump straight into a game.
+Press <kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> / <kbd>4</kbd> in the lobby to jump straight into a game.
 
 ## How to Play
 
@@ -107,10 +108,34 @@ The classic 4×4 number-merging game. The board is built from DOM tiles rather t
 
 Score, best score, largest tile, and move count are shown live; the best score is stored locally and mirrored on the lobby card.
 
+### Link Match · Lianliankan
+
+Classic Shisen-Sho-style matching. The board is a grid of DOM tiles; selection, hints, and the connecting polyline live in CSS/SVG. The core only returns the corner points of a legal path and never touches browser APIs.
+
+**Controls**
+
+| Action          | Keyboard           | Mouse / mobile          |
+| --------------- | ------------------ | ----------------------- |
+| Select a tile   | Enter when focused | Click or tap the tile   |
+| Hint            | `H`                | Hint button             |
+| Undo            | `U` / `Z`          | Undo button             |
+| Restart stage   | `R`                | Restart button          |
+| Next stage      | `N` / `Enter`      | Next-stage button       |
+| Clear selection | `Esc`              | Tap the same tile again |
+
+**Rules**
+
+- Select two tiles of the same pattern. They are removed if a polyline of at most **three straight segments** (zero, one, or two turns) can join them without crossing another tile. The path may travel through the empty border around the board.
+- Clearing the board advances to the next stage: stage 1 is Easy (6×8, 8 patterns, no timer, 5 hints), stage 2 is Standard (8×10, 12 patterns, 180 s, 3 hints), and stage 3 onward is Hard (10×12, 16 patterns, a countdown, 1 hint). From stage 4 the clock keeps tightening, down to 60 seconds.
+- A timeout or a board with no legal pair fails the stage. Restarting restores the score from the beginning of that stage; changing the starting difficulty begins a new run.
+- Consecutive matches build a combo. Timed stages also award leftover seconds on a clear. Hints become scarcer on harder stages.
+
+Score and best score are shown live; the best score is stored locally and mirrored on the lobby card.
+
 ### Shared Features
 
-- **Persistent state**: High scores, match records, sound settings, and preferences are stored in `localStorage`. If storage is unavailable or unwritable, such as in some private-browsing contexts, the app automatically falls back to in-memory storage. Each game uses its own namespace (`snake-game` / `gomoku` / `game-2048`) so their data does not interfere.
-- **Accessibility and usability**: Semantic markup, `aria-live` announcements, keyboard-focusable controls, support for `prefers-reduced-motion`, automatic pause when switching tabs (Snake), and a textual board description (2048).
+- **Persistent state**: High scores, match records, sound settings, and preferences are stored in `localStorage`. If storage is unavailable or unwritable, such as in some private-browsing contexts, the app automatically falls back to in-memory storage. Each game uses its own namespace (`snake-game` / `gomoku` / `game-2048` / `lianliankan`) so their data does not interfere.
+- **Accessibility and usability**: Semantic markup, `aria-live` announcements, keyboard-focusable controls, support for `prefers-reduced-motion`, automatic pause when switching tabs (Snake), and a textual board description (2048 / Link Match).
 - **Zero runtime dependencies**: Built solely with native HTML, CSS, ES Modules, Canvas 2D, and Web Audio.
 
 ## Project Structure
@@ -121,6 +146,7 @@ Score, best score, largest tile, and move count are shown live; the best score i
 ├── snake/index.html                # Snake page
 ├── gomoku/index.html               # Gomoku page
 ├── 2048/index.html                 # 2048 page
+├── lianliankan/index.html          # Link Match page
 ├── public/favicon.svg              # Site icon
 ├── src/
 │   ├── styles/
@@ -128,7 +154,8 @@ Score, best score, largest tile, and move count are shown live; the best score i
 │   │   ├── lobby.css               # Lobby card layout
 │   │   ├── main.css                # Snake page layout
 │   │   ├── gomoku.css              # Gomoku match panel and result card
-│   │   └── game2048.css            # 2048 board geometry, tile palette, and animations
+│   │   ├── game2048.css            # 2048 board geometry, tile palette, and animations
+│   │   └── lianliankan.css         # Link Match board geometry, tile palette, and path animation
 │   └── js/
 │       ├── main.js                 # Snake entry point: module assembly, fixed-timestep loop, and preference persistence
 │       ├── core/                   # Pure Snake logic with no browser APIs; testable in Node.js
@@ -150,6 +177,16 @@ Score, best score, largest tile, and move count are shown live; the best score i
 │       │   │   ├── input-controller.js # Keyboard, directional pad, and swipe gestures → moves
 │       │   │   └── hud.js          # Scoreboard, result card, and textual board description
 │       │   └── main.js             # 2048 entry point: assembly and best-score persistence
+│       ├── lianliankan/
+│       │   ├── core/
+│       │   │   ├── constants.js    # Difficulty tiers, scoring, glyphs, and stage progression
+│       │   │   ├── path-finder.js  # At-most-three-segment connection search (including the border)
+│       │   │   └── lianliankan-game.js # All rules (generation/matching/hints/undo/timer/clear), with no browser APIs
+│       │   ├── ui/
+│       │   │   ├── renderer.js     # DOM tiles and the SVG connecting path
+│       │   │   ├── input-controller.js # Clicks and shortcut keys
+│       │   │   └── hud.js          # Scoreboard, result card, and textual board description
+│       │   └── main.js             # Link Match entry point: assembly and best-score / difficulty persistence
 │       ├── lobby/main.js           # Lobby: reads local progress and provides number-key shortcuts
 │       ├── services/storage.js     # Namespaced, fault-tolerant localStorage factory
 │       └── ui/                     # Snake and shared UI modules
@@ -159,8 +196,8 @@ Score, best score, largest tile, and move count are shown live; the best score i
 │           └── sound-player.js     # Synthesized Web Audio effects (no binary assets; shared by both games)
 ├── scripts/
 │   ├── dev-server.mjs              # Zero-dependency static server for development and previews
-│   ├── build.mjs                   # esbuild multi-page bundle, content hashes, and rewriting of all four entry pages
-│   └── check-assets.mjs            # Static asset reference validation for all four entry pages
+│   ├── build.mjs                   # esbuild multi-page bundle, content hashes, and rewriting of all five entry pages
+│   └── check-assets.mjs            # Static asset reference validation for all five entry pages
 ├── tests/                          # Vitest unit tests
 ├── task-manager/                   # Standalone full-stack Task Manager project (see below)
 └── .github/workflows/              # CI and GitHub Pages deployment
@@ -168,9 +205,9 @@ Score, best score, largest tile, and move count are shown live; the best score i
 
 ### Architecture Highlights
 
-- **Rules separated from presentation**: `src/js/core/snake-game.js`, `src/js/gomoku/gomoku-game.js`, and `src/js/game2048/core/game-2048.js` are classes with no browser API dependencies (Snake and 2048 receive their random number generator through the constructor), allowing deterministic rule testing in Node.js. Rendering, input, sound, and storage are independent, while each `main.js` entry point only assembles and drives the modules, so rule changes do not affect rendering code.
-- **Three update models**: Snake is a real-time game. A fixed-timestep accumulator advances its logic according to `tickIntervalMs`, while each frame uses `alpha` (progress toward the next tick) to interpolate between the previous and current states, providing consistent behavior across devices with different refresh rates. Gomoku changes only after input, has no animation loop, and redraws a single frame on demand. 2048 is turn-based as well, but animates through DOM tiles: the core gives every tile a stable id and the position it held before the move, which lets the renderer reuse elements and leave the slide and merge animations to CSS transitions.
-- **Layered styles**: `base.css` provides design tokens and components shared by all four pages (buttons, board frame, overlay, on-screen directional pad, and more). Each page stylesheet imports it with `@import` and defines only its own layout differences. During the build, esbuild inlines the imports so each page requests only one CSS file.
+- **Rules separated from presentation**: `src/js/core/snake-game.js`, `src/js/gomoku/gomoku-game.js`, `src/js/game2048/core/game-2048.js`, and `src/js/lianliankan/core/lianliankan-game.js` are classes with no browser API dependencies (Snake, 2048, and Link Match receive their random number generator through the constructor), allowing deterministic rule testing in Node.js. Rendering, input, sound, and storage are independent, while each `main.js` entry point only assembles and drives the modules, so rule changes do not affect rendering code.
+- **Several update models**: Snake is a real-time game. A fixed-timestep accumulator advances its logic according to `tickIntervalMs`, while each frame uses `alpha` (progress toward the next tick) to interpolate between the previous and current states, providing consistent behavior across devices with different refresh rates. Gomoku changes only after input, has no animation loop, and redraws a single frame on demand. 2048 is turn-based as well, but animates through DOM tiles: the core gives every tile a stable id and the position it held before the move, which lets the renderer reuse elements and leave the slide and merge animations to CSS transitions. Link Match is also turn-based; timed stages receive elapsed time through `tick()` from `requestAnimationFrame`, and the core returns the polyline that the SVG overlay traces.
+- **Layered styles**: `base.css` provides design tokens and components shared by every page (buttons, board frame, overlay, on-screen directional pad, and more). Each page stylesheet imports it with `@import` and defines only its own layout differences. During the build, esbuild inlines the imports so each page requests only one CSS file.
 
 ## Development Scripts
 
@@ -181,7 +218,7 @@ Score, best score, largest tile, and move count are shown live; the best score i
 | `npm run preview`      | Preview `dist/` with the static server                                                   |
 | `npm run lint`         | Run ESLint (`npm run lint:fix` applies automatic fixes)                                  |
 | `npm run format:check` | Check formatting with Prettier (`npm run format` applies formatting)                     |
-| `npm run check:assets` | Verify that local assets referenced by the four entry pages exist and use relative paths |
+| `npm run check:assets` | Verify that local assets referenced by the five entry pages exist and use relative paths |
 | `npm test`             | Run Vitest unit tests (`npm run test:watch` starts watch mode)                           |
 | `npm run verify`       | Run all checks above in sequence; equivalent to the core CI steps                        |
 
@@ -195,12 +232,14 @@ Tests are located in `tests/` and use Vitest (run them with `npm test`):
 - `gomoku-game.test.js`: Initial state and parameter validation; alternating turns and move history; rejection of out-of-bounds and duplicate moves; horizontal, vertical, and both diagonal win detection; completing a gapped line of five; overline wins; four stones not counting as a win; differently colored stones not connecting; lines not continuing across board boundaries; draws; rejecting moves after the game ends; undo, including starting again after undoing a winning move; and resetting with a different starting player.
 - `game-2048.test.js`: Initial layout and parameter validation; reproducible runs with an injected random source; sliding and merging in all four directions; the "one merge per tile per move" rule and resolution from the leading edge; moves that change nothing counting neither as a move nor spawning a tile; cumulative scoring; the 2048 win condition and "keep going"; the win being reported only once; the run ending when the board is full without equal neighbours; the tile metadata a renderer needs (ids, previous positions, merge sources); and `loadBoard` validation together with the immutability of the exposed snapshots.
 - `game-2048-ui.test.js` (jsdom): The renderer building the background cells, writing a tile's cell, value, and digit count into the DOM, reusing the same element while a tile slides, sliding consumed tiles into the merge before dropping them (and dropping them immediately on the next move), and leaving no stale elements after a restart; the HUD scoreboard, textual board description, and win/game-over cards; and the 2048 input controller's key, pad, and swipe mapping.
+- `lianliankan-game.test.js`: The three difficulty profiles and later-stage tightening; reproducible boards with an injected random source; even pair generation; legal zero-, one-, and two-turn paths; blocked paths; mismatched patterns; wrapping around the border; clears and deadlocks; combo and clear bonuses; hints; undo, including after a winning pair; timeout failures; restarting a stage; and changing difficulty.
+- `lianliankan-ui.test.js` (jsdom): The renderer building one button per cell, hiding empties, marking the selection, and writing the polyline into SVG; the HUD scoreboard, clear card, and announcements; and the input controller's click plus `H` / `U` / `R` / `N` / `Esc` mapping.
 - `input-controller.test.js` (jsdom): Arrow-key and `WASD` mapping, command keys, ignoring modified key combinations, on-screen directional controls, swipe and tap gestures, and no response after `detach()`.
 - `storage.test.js`: Number, Boolean, and string reads and writes; allowlist validation; namespace isolation; fallback for corrupted data; and in-memory fallback when `localStorage` throws or is unavailable.
 
 ## GitHub Actions
 
-- **`ci.yml` — Continuous Integration**: Runs on pushes to any branch, every pull request, and manual dispatch. Across a Node.js 20 / 22 / 24 matrix, it runs `npm ci`, ESLint, Prettier checks, static asset validation, Vitest tests, and the production build. It then verifies, page by page, that all four entry pages and their content-hashed JS/CSS files exist in `dist/`, that the HTML was rewritten correctly, and that `.nojekyll` and the favicon are present, before uploading the `dist/` artifact with a seven-day retention period. New commits to the same branch automatically cancel incomplete older runs.
+- **`ci.yml` — Continuous Integration**: Runs on pushes to any branch, every pull request, and manual dispatch. Across a Node.js 20 / 22 / 24 matrix, it runs `npm ci`, ESLint, Prettier checks, static asset validation, Vitest tests, and the production build. It then verifies, page by page, that all five entry pages and their content-hashed JS/CSS files exist in `dist/`, that the HTML was rewritten correctly, and that `.nojekyll` and the favicon are present, before uploading the `dist/` artifact with a seven-day retention period. New commits to the same branch automatically cancel incomplete older runs.
 - **`deploy-pages.yml` — Deploy to GitHub Pages**: Builds and publishes `dist/` on pushes to `main` or manual dispatch. Before first use, select **GitHub Actions** under **Settings → Pages → Build and deployment → Source**. The workflow fails until this is enabled, but remains independent of CI. Because all asset references are relative, the site also works under a `https://<user>.github.io/<repo>/` subpath.
 - **`dependabot.yml` — Dependency Maintenance**: Checks npm dependencies and GitHub Actions versions weekly. Minor and patch updates to development dependencies are grouped into a single pull request.
 

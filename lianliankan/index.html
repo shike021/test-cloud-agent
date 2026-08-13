@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1220" />
+    <meta
+      name="description"
+      content="经典连连看：相同图案用不超过三条直线相连即可消除，支持轻松 / 标准 / 困难三档难度升级、提示、撤销与计分。"
+    />
+    <title>连连看 · Link Match</title>
+    <link rel="icon" href="../public/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../src/styles/lianliankan.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app__header app__header--game">
+        <a class="app__back" href="../index.html">
+          <span aria-hidden="true">←</span>
+          游戏大厅
+        </a>
+        <div class="app__heading">
+          <h1 class="app__title">连连看</h1>
+          <p class="app__tagline">点选相同图案 · 至多两拐 · H 提示 · U 撤销 · R 重开</p>
+        </div>
+      </header>
+
+      <main class="lianliankan">
+        <section class="scoreboard scoreboard--llk" aria-label="计分板">
+          <div class="stat">
+            <span class="stat__label">得分</span>
+            <output class="stat__value" id="score">0</output>
+          </div>
+          <div class="stat">
+            <span class="stat__label">最高分</span>
+            <output class="stat__value" id="best-score">0</output>
+          </div>
+          <div class="stat">
+            <span class="stat__label">关卡</span>
+            <output class="stat__value" id="stage">1</output>
+          </div>
+          <div class="stat">
+            <span class="stat__label">连击</span>
+            <output class="stat__value" id="combo">0</output>
+          </div>
+          <div class="stat">
+            <span class="stat__label">提示</span>
+            <output class="stat__value" id="hints">0</output>
+          </div>
+          <div class="stat">
+            <span class="stat__label">时间</span>
+            <output class="stat__value" id="time">不限时</output>
+          </div>
+        </section>
+
+        <div class="board board--lianliankan" id="board-frame">
+          <div class="board__tiles" id="tiles" role="grid" aria-label="连连看棋盘"></div>
+          <svg class="board__paths" id="paths" aria-hidden="true"></svg>
+          <div class="overlay" id="overlay" data-status="playing" hidden>
+            <div class="overlay__panel">
+              <h2 class="overlay__title" id="overlay-title">本关结束</h2>
+              <p class="overlay__message" id="overlay-message"></p>
+              <div class="overlay__actions">
+                <button class="button button--primary" id="overlay-advance" type="button" hidden>下一关 (N)</button>
+                <button class="button" id="overlay-restart" type="button">再试一次 (R)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="visually-hidden" id="board-summary"></p>
+
+        <div class="controls">
+          <button class="button button--primary" id="hint" type="button">提示 (H)</button>
+          <button class="button" id="undo" type="button">撤销 (U)</button>
+          <button class="button" id="restart" type="button">重开本关 (R)</button>
+        </div>
+
+        <section class="settings" aria-label="游戏设置">
+          <label class="settings__field" for="difficulty">
+            <span>起始难度</span>
+            <select class="settings__select" id="difficulty">
+              <option value="easy">轻松</option>
+              <option value="standard">标准</option>
+              <option value="hard">困难</option>
+            </select>
+          </label>
+        </section>
+
+        <section class="legend" aria-label="玩法说明">
+          <h2 class="legend__title">玩法说明</h2>
+          <ul class="legend__list">
+            <li>
+              点击两张图案相同的牌，若能用不超过 <strong>3 条直线</strong>（0 / 1 / 2
+              次拐弯）且不穿过其他牌相连，即可消除。
+            </li>
+            <li>全部消除即过关，自动进入下一难度：棋盘更大、图案更多；标准关开始限时，困难关提示更少。</li>
+            <li>
+              <kbd>H</kbd> 消耗一次提示并高亮一对可消的牌；<kbd>U</kbd> / <kbd>Z</kbd> 撤销上一对；<kbd>Esc</kbd>
+              取消选中。
+            </li>
+            <li>
+              过关后按 <kbd>N</kbd> 或点「下一关」继续；失败或超时可按
+              <kbd>R</kbd> 重开当前关，累计得分会回到本关开始时。
+            </li>
+            <li>连续消除会叠加连击分；限时关卡过关时按剩余秒数发放奖励。最高分保存在本地。</li>
+          </ul>
+        </section>
+      </main>
+
+      <footer class="app__footer">
+        <p>纯前端实现 · 无第三方运行时依赖</p>
+      </footer>
+    </div>
+
+    <p class="visually-hidden" id="live-region" role="status" aria-live="polite"></p>
+
+    <script type="module" src="../src/js/lianliankan/main.js"></script>
+  </body>
+</html>

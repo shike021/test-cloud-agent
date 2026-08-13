@@ -59,7 +59,7 @@ jobs:
           test -f dist/public/favicon.svg || { echo "dist/public/favicon.svg is missing"; exit 1; }
           # Every page of the arcade must ship its own HTML plus hashed bundles,
           # and its HTML must point at them instead of at the sources.
-          for page in "lobby:index.html" "snake:snake/index.html" "gomoku:gomoku/index.html" "game2048:2048/index.html"; do
+          for page in "lobby:index.html" "snake:snake/index.html" "gomoku:gomoku/index.html" "game2048:2048/index.html" "lianliankan:lianliankan/index.html"; do
             name="${page%%:*}"
             html="dist/${page#*:}"
             test -f "$html" || { echo "$html is missing"; exit 1; }

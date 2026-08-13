@@ -2,7 +2,7 @@
 
 [简体中文](./README.md) · [English](./README_en.md) · [日本語](./README_jp.md) · Español
 
-Una colección de minijuegos puramente frontend y sin dependencias en tiempo de ejecución: **vestíbulo de juegos + Snake + Gomoku + 2048**. Las reglas están encapsuladas en módulos centrales que se pueden probar de forma unitaria, y todos los juegos se pueden jugar tanto en escritorio como en móvil.
+Una colección de minijuegos puramente frontend y sin dependencias en tiempo de ejecución: **vestíbulo de juegos + Snake + Gomoku + 2048 + Lianliankan**. Las reglas están encapsuladas en módulos centrales que se pueden probar de forma unitaria, y todos los juegos se pueden jugar tanto en escritorio como en móvil.
 
 [![CI](https://github.com/shike021/test-cloud-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/shike021/test-cloud-agent/actions/workflows/ci.yml)
 [![Deploy to GitHub Pages](https://github.com/shike021/test-cloud-agent/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/shike021/test-cloud-agent/actions/workflows/deploy-pages.yml)
@@ -26,14 +26,15 @@ Cuando necesites un sitio estático distribuible, ejecuta `npm run build`; el re
 
 ## Rutas de las páginas
 
-| Ruta       | Página    | Descripción                                                                     |
-| ---------- | --------- | ------------------------------------------------------------------------------- |
-| `/`        | Vestíbulo | Tarjetas de acceso que muestran los récords y el historial guardados localmente |
-| `/snake/`  | Snake     | Un jugador; teclado, cruceta en pantalla o gestos de deslizamiento              |
-| `/gomoku/` | Gomoku    | 15×15 para dos jugadores en el mismo equipo; ratón, táctil o cursor de teclado  |
-| `/2048/`   | 2048      | Un jugador, combinación de números 4×4; teclado, cruceta o deslizamiento        |
+| Ruta            | Página      | Descripción                                                                     |
+| --------------- | ----------- | ------------------------------------------------------------------------------- |
+| `/`             | Vestíbulo   | Tarjetas de acceso que muestran los récords y el historial guardados localmente |
+| `/snake/`       | Snake       | Un jugador; teclado, cruceta en pantalla o gestos de deslizamiento              |
+| `/gomoku/`      | Gomoku      | 15×15 para dos jugadores en el mismo equipo; ratón, táctil o cursor de teclado  |
+| `/2048/`        | 2048        | Un jugador, combinación de números 4×4; teclado, cruceta o deslizamiento        |
+| `/lianliankan/` | Lianliankan | Un jugador: empareja fichas con como máximo dos giros y dificultad creciente    |
 
-En el vestíbulo, las teclas <kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> llevan directamente al juego correspondiente.
+En el vestíbulo, las teclas <kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> / <kbd>4</kbd> llevan directamente al juego correspondiente.
 
 ## Cómo se juega
 
@@ -107,10 +108,34 @@ El clásico de combinación de números en 4×4. El tablero está formado por fi
 
 La puntuación, el récord, la ficha mayor y el número de jugadas se muestran en tiempo real; el récord se guarda localmente y se refleja en la tarjeta del vestíbulo.
 
+### Lianliankan · Link Match
+
+Emparejamiento clásico al estilo Shisen-Sho. El tablero es una cuadrícula de fichas DOM; la selección, las pistas y la polilínea de conexión viven en CSS/SVG. El núcleo solo devuelve los vértices de un camino legal y no usa APIs del navegador.
+
+**Controles**
+
+| Acción           | Teclado          | Ratón / móvil                 |
+| ---------------- | ---------------- | ----------------------------- |
+| Elegir ficha     | Enter al enfocar | Clic o toque en la ficha      |
+| Pista            | `H`              | Botón «Pista»                 |
+| Deshacer         | `U` / `Z`        | Botón «Deshacer»              |
+| Reiniciar fase   | `R`              | Botón «Reiniciar»             |
+| Siguiente fase   | `N` / `Enter`    | Botón «Siguiente»             |
+| Quitar selección | `Esc`            | Tocar de nuevo la misma ficha |
+
+**Reglas**
+
+- Elige dos fichas del mismo dibujo. Se eliminan si un trazado de como máximo **tres segmentos rectos** (cero, uno o dos giros) las une sin atravesar otra ficha. El camino puede salir por el borde vacío del tablero.
+- Vaciar el tablero pasa a la siguiente fase: la 1 es fácil (6×8, 8 dibujos, sin reloj, 5 pistas), la 2 es estándar (8×10, 12 dibujos, 180 s, 3 pistas) y a partir de la 3 es difícil (10×12, 16 dibujos, cuenta atrás, 1 pista). Desde la fase 4 el reloj se sigue apretando, hasta 60 segundos.
+- Un tiempo agotado o un tablero sin pareja legal falla la fase. Reiniciar restaura la puntuación del inicio de esa fase; cambiar la dificultad de partida comienza una nueva ronda.
+- Los emparejamientos seguidos suman combo. En las fases con reloj, los segundos restantes también dan bonus. Las pistas escasean en las dificultades altas.
+
+La puntuación y el récord se muestran en vivo; el récord se guarda localmente y se refleja en la tarjeta del vestíbulo.
+
 ### Características comunes
 
-- **Estado persistente**: los récords, el historial, el interruptor de sonido y las preferencias se guardan en `localStorage` y, cuando no se puede escribir (por ejemplo, en modo privado), se degradan automáticamente a almacenamiento en memoria; los tres juegos usan espacios de nombres propios (`snake-game` / `gomoku` / `game-2048`) y no interfieren entre sí.
-- **Accesibilidad y experiencia**: etiquetas semánticas, anuncios con `aria-live`, controles enfocables con el teclado, compatibilidad con `prefers-reduced-motion`, pausa automática al cambiar de pestaña (Snake) y descripción textual del tablero (2048).
+- **Estado persistente**: los récords, el historial, el interruptor de sonido y las preferencias se guardan en `localStorage` y, cuando no se puede escribir (por ejemplo, en modo privado), se degradan automáticamente a almacenamiento en memoria; los cuatro juegos usan espacios de nombres propios (`snake-game` / `gomoku` / `game-2048` / `lianliankan`) y no interfieren entre sí.
+- **Accesibilidad y experiencia**: etiquetas semánticas, anuncios con `aria-live`, controles enfocables con el teclado, compatibilidad con `prefers-reduced-motion`, pausa automática al cambiar de pestaña (Snake) y descripción textual del tablero (2048 / Lianliankan).
 - **Cero dependencias en tiempo de ejecución**: solo HTML, CSS y ES Modules nativos junto con Canvas 2D y Web Audio.
 
 ## Estructura del proyecto
@@ -121,6 +146,7 @@ La puntuación, el récord, la ficha mayor y el número de jugadas se muestran e
 ├── snake/index.html                # Página de Snake
 ├── gomoku/index.html               # Página de Gomoku
 ├── 2048/index.html                 # Página de 2048
+├── lianliankan/index.html          # Página de Lianliankan
 ├── public/favicon.svg              # Icono del sitio
 ├── src/
 │   ├── styles/
@@ -128,7 +154,8 @@ La puntuación, el récord, la ficha mayor y el número de jugadas se muestran e
 │   │   ├── lobby.css               # Diseño de las tarjetas del vestíbulo
 │   │   ├── main.css                # Diseño de la página de Snake
 │   │   ├── gomoku.css              # Panel de partida y tarjeta de resultado de Gomoku
-│   │   └── game2048.css            # Geometría del tablero, paleta de fichas y animaciones de 2048
+│   │   ├── game2048.css            # Geometría del tablero, paleta de fichas y animaciones de 2048
+│   │   └── lianliankan.css         # Geometría del tablero, paleta de fichas y animación del trazo de Lianliankan
 │   └── js/
 │       ├── main.js                 # Entrada de Snake: ensamblado de módulos, bucle de paso fijo y persistencia de preferencias
 │       ├── core/                   # Lógica pura de Snake, sin API del navegador, testeable en Node
@@ -150,6 +177,16 @@ La puntuación, el récord, la ficha mayor y el número de jugadas se muestran e
 │       │   │   ├── input-controller.js # Teclado, cruceta y gestos de deslizamiento → movimientos
 │       │   │   └── hud.js          # Marcador, tarjeta de resultado y descripción textual del tablero
 │       │   └── main.js             # Entrada de 2048: ensamblado y persistencia del récord
+│       ├── lianliankan/
+│       │   ├── core/
+│       │   │   ├── constants.js    # Dificultades, puntuación, glifos y progresión de fases
+│       │   │   ├── path-finder.js  # Búsqueda de conexión de como máximo tres segmentos (incluido el borde)
+│       │   │   └── lianliankan-game.js # Todas las reglas (generación/emparejamiento/pistas/deshacer/reloj/victoria), sin API del navegador
+│       │   ├── ui/
+│       │   │   ├── renderer.js     # Fichas DOM y el trazo SVG
+│       │   │   ├── input-controller.js # Clics y teclas rápidas
+│       │   │   └── hud.js          # Marcador, tarjeta de resultado y descripción textual del tablero
+│       │   └── main.js             # Entrada de Lianliankan: ensamblado y persistencia del récord / dificultad
 │       ├── lobby/main.js           # Vestíbulo: lectura del progreso local y accesos con teclas numéricas
 │       ├── services/storage.js     # Fábrica de localStorage con espacios de nombres y tolerante a fallos
 │       └── ui/                     # Módulos de interfaz de Snake y compartidos
@@ -159,8 +196,8 @@ La puntuación, el récord, la ficha mayor y el número de jugadas se muestran e
 │           └── sound-player.js     # Efectos sintetizados con Web Audio (sin recursos binarios, compartidos por ambos juegos)
 ├── scripts/
 │   ├── dev-server.mjs              # Servidor estático sin dependencias (desarrollo y previsualización)
-│   ├── build.mjs                   # Empaquetado multipágina con esbuild + hash de contenido + reescritura de las cuatro páginas de entrada
-│   └── check-assets.mjs            # Validación de las referencias a recursos estáticos de las cuatro páginas de entrada
+│   ├── build.mjs                   # Empaquetado multipágina con esbuild + hash de contenido + reescritura de las cinco páginas de entrada
+│   └── check-assets.mjs            # Validación de las referencias a recursos estáticos de las cinco páginas de entrada
 ├── tests/                          # Pruebas unitarias con Vitest
 ├── task-manager/                   # Proyecto full-stack Task Manager independiente (ver más adelante)
 └── .github/workflows/              # CI y despliegue en GitHub Pages
@@ -168,9 +205,9 @@ La puntuación, el récord, la ficha mayor y el número de jugadas se muestran e
 
 ### Claves de la arquitectura
 
-- **Reglas separadas de la presentación**: `src/js/core/snake-game.js`, `src/js/gomoku/gomoku-game.js` y `src/js/game2048/core/game-2048.js` son clases que no dependen de ninguna API del navegador (en Snake y 2048 el generador aleatorio se inyecta por el constructor), de modo que las reglas se pueden probar de forma determinista en Node; el renderizado, la entrada, el sonido y el almacenamiento son independientes, y cada `main.js` de entrada solo se encarga del ensamblado y de dirigir el flujo, así que cambiar las reglas no afecta al código de renderizado.
-- **Tres formas de avanzar el juego**: Snake es un juego en tiempo real que usa un acumulador de paso fijo para avanzar la lógica según `tickIntervalMs` y en cada fotograma interpola entre el estado anterior y el actual con `alpha` (el progreso hacia el siguiente tick), por lo que se comporta igual en dispositivos con distintas frecuencias de refresco; Gomoku solo cambia tras una entrada, no tiene bucle de animación y redibuja un único fotograma bajo demanda; 2048 también es por turnos, pero anima con fichas del DOM: el núcleo da a cada ficha un id estable y su «posición antes del movimiento», con lo que la capa de renderizado reutiliza los elementos y deja las animaciones de deslizamiento y fusión a las transiciones CSS.
-- **Estilos por capas**: `base.css` aporta las variables de diseño y los componentes comunes a las cuatro páginas (botones, marco del tablero, superposición, cruceta en pantalla, etc.), y cada hoja de estilos de página lo incorpora con `@import` para describir solo sus diferencias de diseño; durante la compilación, esbuild inserta los `@import`, de modo que cada página termina solicitando un único archivo CSS.
+- **Reglas separadas de la presentación**: `src/js/core/snake-game.js`, `src/js/gomoku/gomoku-game.js`, `src/js/game2048/core/game-2048.js` y `src/js/lianliankan/core/lianliankan-game.js` son clases que no dependen de ninguna API del navegador (en Snake, 2048 y Lianliankan el generador aleatorio se inyecta por el constructor), de modo que las reglas se pueden probar de forma determinista en Node; el renderizado, la entrada, el sonido y el almacenamiento son independientes, y cada `main.js` de entrada solo se encarga del ensamblado y de dirigir el flujo, así que cambiar las reglas no afecta al código de renderizado.
+- **Varias formas de avanzar el juego**: Snake es un juego en tiempo real que usa un acumulador de paso fijo para avanzar la lógica según `tickIntervalMs` y en cada fotograma interpola entre el estado anterior y el actual con `alpha` (el progreso hacia el siguiente tick), por lo que se comporta igual en dispositivos con distintas frecuencias de refresco; Gomoku solo cambia tras una entrada, no tiene bucle de animación y redibuja un único fotograma bajo demanda; 2048 también es por turnos, pero anima con fichas del DOM: el núcleo da a cada ficha un id estable y su «posición antes del movimiento», con lo que la capa de renderizado reutiliza los elementos y deja las animaciones de deslizamiento y fusión a las transiciones CSS. Lianliankan también es por turnos; en las fases con reloj la entrada inyecta el tiempo transcurrido en `tick()` desde `requestAnimationFrame`, y el núcleo devuelve la polilínea que traza la capa SVG.
+- **Estilos por capas**: `base.css` aporta las variables de diseño y los componentes comunes a todas las páginas (botones, marco del tablero, superposición, cruceta en pantalla, etc.), y cada hoja de estilos de página lo incorpora con `@import` para describir solo sus diferencias de diseño; durante la compilación, esbuild inserta los `@import`, de modo que cada página termina solicitando un único archivo CSS.
 
 ## Scripts de desarrollo
 
@@ -181,7 +218,7 @@ La puntuación, el récord, la ficha mayor y el número de jugadas se muestran e
 | `npm run preview`      | Previsualiza `dist/` con el servidor estático                                                 |
 | `npm run lint`         | Comprobación con ESLint (`npm run lint:fix` corrige automáticamente)                          |
 | `npm run format:check` | Comprobación de formato con Prettier (`npm run format` formatea automáticamente)              |
-| `npm run check:assets` | Verifica que los recursos locales de las cuatro páginas existan y usen rutas relativas        |
+| `npm run check:assets` | Verifica que los recursos locales de las cinco páginas existan y usen rutas relativas         |
 | `npm test`             | Ejecuta las pruebas unitarias de Vitest (`npm run test:watch` en modo observación)            |
 | `npm run verify`       | Ejecuta en orden todas las comprobaciones anteriores; equivale a los pasos centrales de la CI |
 
@@ -195,12 +232,14 @@ Las pruebas están en `tests/` y usan Vitest (se ejecutan con `npm test`):
 - `gomoku-game.test.js`: estado inicial y validación de parámetros, alternancia de turnos e historial, rechazo de jugadas fuera del tablero o repetidas, detección de victoria en horizontal / vertical / ambas diagonales, completar un hueco para hacer cinco, victoria con línea larga, cuatro piedras que no ganan, piedras de distinto color que no forman línea, líneas que no cruzan el borde del tablero, tablas, rechazo de jugadas tras el final, deshacer (incluido reiniciar tras deshacer la jugada decisiva) y el reinicio con cambio de primer jugador.
 - `game-2048.test.js`: disposición inicial y validación de parámetros, reproducibilidad al inyectar el generador aleatorio, deslizamiento y fusión de columnas en las cuatro direcciones, la regla de «una sola fusión por movimiento» y la resolución desde el borde, los movimientos inválidos que no cuentan como jugada ni generan fichas, la acumulación de puntuación, la victoria al llegar a 2048 y «seguir jugando», el anuncio de victoria una única vez, el final con el tablero lleno y sin vecinos iguales, los metadatos que necesita la capa de renderizado (id de ficha, posición previa al movimiento, origen de la fusión) y la validación de los argumentos de `loadBoard` junto con la inmutabilidad de las instantáneas.
 - `game-2048-ui.test.js` (jsdom): el renderizador que genera las casillas de fondo, escribe en el DOM las coordenadas / el valor / el número de dígitos de cada ficha, reutiliza el mismo elemento al deslizar, elimina las fichas fusionadas tras su entrada (el siguiente movimiento las limpia de inmediato) y no deja elementos antiguos tras reiniciar; el marcador del HUD, la descripción textual del tablero y las tarjetas de victoria y fin de partida; y el mapeo de teclas, cruceta y deslizamientos del controlador de entrada de 2048.
+- `lianliankan-game.test.js`: los tres perfiles de dificultad y el endurecimiento posterior; tableros reproducibles con un generador aleatorio inyectado; generación de parejas pares; caminos legales de cero, uno y dos giros; caminos bloqueados; dibujos distintos; el recodo por el borde; victorias y callejones sin salida; combo y bonus de fase; pistas; deshacer, también tras la pareja decisiva; fallos por tiempo; reiniciar la fase y cambiar de dificultad.
+- `lianliankan-ui.test.js` (jsdom): el renderizador que crea un botón por casilla, oculta los huecos, marca la selección y escribe la polilínea en SVG; el marcador del HUD, la tarjeta de fase superada y los anuncios; y el mapeo de clics más `H` / `U` / `R` / `N` / `Esc` del controlador de entrada.
 - `input-controller.test.js` (jsdom): mapeo de las flechas y de `WASD`, teclas de comando, teclas modificadoras ignoradas, cruceta en pantalla, gestos de deslizamiento y toque, y la ausencia de respuesta después de `detach()`.
 - `storage.test.js`: lectura y escritura de números / booleanos / cadenas con validación por lista blanca, aislamiento entre espacios de nombres, recuperación ante datos corruptos y degradación a memoria cuando `localStorage` lanza excepciones o no está disponible.
 
 ## GitHub Actions
 
-- **`ci.yml` — Integración continua**: se ejecuta en cada push a cualquier rama, en todos los pull requests y de forma manual; en la matriz de Node 20 / 22 / 24 lanza en orden `npm ci`, ESLint, la comprobación de Prettier, la validación de recursos estáticos, las pruebas de Vitest y la compilación de producción, y después comprueba página por página que en `dist/` estén las cuatro páginas de entrada con sus JS/CSS con hash, que el HTML se haya reescrito correctamente y que existan `.nojekyll` y el favicon, para finalmente subir el artefacto `dist/` (con 7 días de retención). Los nuevos commits de una misma rama cancelan automáticamente las ejecuciones anteriores sin terminar.
+- **`ci.yml` — Integración continua**: se ejecuta en cada push a cualquier rama, en todos los pull requests y de forma manual; en la matriz de Node 20 / 22 / 24 lanza en orden `npm ci`, ESLint, la comprobación de Prettier, la validación de recursos estáticos, las pruebas de Vitest y la compilación de producción, y después comprueba página por página que en `dist/` estén las cinco páginas de entrada con sus JS/CSS con hash, que el HTML se haya reescrito correctamente y que existan `.nojekyll` y el favicon, para finalmente subir el artefacto `dist/` (con 7 días de retención). Los nuevos commits de una misma rama cancelan automáticamente las ejecuciones anteriores sin terminar.
 - **`deploy-pages.yml` — Despliegue en GitHub Pages**: compila y publica `dist/` en cada push a `main` o de forma manual. La primera vez hay que elegir **GitHub Actions** en **Settings → Pages → Build and deployment → Source**; hasta entonces este workflow falla, pero es independiente de la CI. Como todas las referencias a recursos son relativas, el sitio también funciona bajo la subruta `https://<user>.github.io/<repo>/`.
 - **`dependabot.yml` — Mantenimiento de dependencias**: revisa cada semana las actualizaciones de las dependencias npm y de las versiones de GitHub Actions; las actualizaciones minor/patch de las dependencias de desarrollo se agrupan en un único PR.
 

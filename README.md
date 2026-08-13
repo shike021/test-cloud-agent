@@ -2,7 +2,7 @@
 
 简体中文 · [English](./README_en.md) · [日本語](./README_jp.md) · [Español](./README_es.md)
 
-一套零运行时依赖的纯前端小游戏合集：**游戏大厅 + 贪吃蛇 + 五子棋 + 2048**。规则被封装在可单元测试的核心模块里，桌面与移动端都能直接玩。
+一套零运行时依赖的纯前端小游戏合集：**游戏大厅 + 贪吃蛇 + 五子棋 + 2048 + 连连看**。规则被封装在可单元测试的核心模块里，桌面与移动端都能直接玩。
 
 [![CI](https://github.com/shike021/test-cloud-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/shike021/test-cloud-agent/actions/workflows/ci.yml)
 [![Deploy to GitHub Pages](https://github.com/shike021/test-cloud-agent/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/shike021/test-cloud-agent/actions/workflows/deploy-pages.yml)
@@ -26,14 +26,15 @@ npm run dev            # 启动本地静态服务器
 
 ## 页面入口
 
-| 路由       | 页面     | 说明                                     |
-| ---------- | -------- | ---------------------------------------- |
-| `/`        | 游戏大厅 | 卡片入口，展示本地保存的最高分与对局战绩 |
-| `/snake/`  | 贪吃蛇   | 单人，键盘 / 屏幕方向键 / 滑动手势       |
-| `/gomoku/` | 五子棋   | 15×15 双人同机，鼠标、触控或键盘光标落子 |
-| `/2048/`   | 2048     | 单人 4×4 数字合成，键盘 / 方向键 / 滑动  |
+| 路由            | 页面     | 说明                                         |
+| --------------- | -------- | -------------------------------------------- |
+| `/`             | 游戏大厅 | 卡片入口，展示本地保存的最高分与对局战绩     |
+| `/snake/`       | 贪吃蛇   | 单人，键盘 / 屏幕方向键 / 滑动手势           |
+| `/gomoku/`      | 五子棋   | 15×15 双人同机，鼠标、触控或键盘光标落子     |
+| `/2048/`        | 2048     | 单人 4×4 数字合成，键盘 / 方向键 / 滑动      |
+| `/lianliankan/` | 连连看   | 单人三折连线消除，轻松 / 标准 / 困难递进升级 |
 
-在大厅按 <kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> 可直接进入对应游戏。
+在大厅按 <kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> / <kbd>4</kbd> 可直接进入对应游戏。
 
 ## 游戏说明
 
@@ -107,10 +108,34 @@ npm run dev            # 启动本地静态服务器
 
 得分、最高分、最大方块与步数实时显示，最高分保存在本地并回显到大厅卡片上。
 
+### 连连看 · Link Match
+
+经典三折连线消除。棋盘是 DOM 方块，选中、提示与连线动画都写在样式表里；规则内核只返回路径折点，不触碰浏览器 API。
+
+**操作**
+
+| 操作     | 键盘          | 鼠标 / 移动端    |
+| -------- | ------------- | ---------------- |
+| 选牌     | 聚焦后回车    | 点击或轻点牌面   |
+| 提示     | `H`           | 「提示」按钮     |
+| 撤销     | `U` / `Z`     | 「撤销」按钮     |
+| 重开本关 | `R`           | 「重开本关」按钮 |
+| 下一关   | `N` / `Enter` | 「下一关」按钮   |
+| 取消选中 | `Esc`         | 再点同一张牌     |
+
+**规则**
+
+- 点选两张图案相同的牌，若能用不超过 **3 条直线**（0 / 1 / 2 次拐弯）且路径不穿过其他牌相连，即可消除。路径可以绕出棋盘外沿。
+- 全部消除即过关。过关后进入下一关：第 1 关轻松（6×8、8 种图案、不限时、5 次提示），第 2 关标准（8×10、12 种、180 秒、3 次提示），第 3 关及以后困难（10×12、16 种、倒计时、1 次提示）；第 4 关起倒计时继续收紧，最短 60 秒。
+- 失败（超时或无解）可重开当前关，得分回到本关开始时；切换起始难度会开一局新的挑战。
+- 连续成功消除会叠加连击分；限时关过关时按剩余秒数发放奖励。提示次数随难度减少，用完即不可再用。
+
+得分与最高分实时显示，最高分保存在本地并回显到大厅卡片上。
+
 ### 共同特性
 
-- **状态持久化**：最高分、战绩、音效开关与偏好保存在 `localStorage`，在隐私模式等不可写场景下自动退化为内存存储；三款游戏使用各自命名空间（`snake-game` / `gomoku` / `game-2048`），互不干扰。
-- **无障碍与体验**：语义化标签、`aria-live` 播报、键盘可聚焦控件、`prefers-reduced-motion` 支持、切换标签页自动暂停（贪吃蛇）、棋盘文字描述（2048）。
+- **状态持久化**：最高分、战绩、音效开关与偏好保存在 `localStorage`，在隐私模式等不可写场景下自动退化为内存存储；四款游戏使用各自命名空间（`snake-game` / `gomoku` / `game-2048` / `lianliankan`），互不干扰。
+- **无障碍与体验**：语义化标签、`aria-live` 播报、键盘可聚焦控件、`prefers-reduced-motion` 支持、切换标签页自动暂停（贪吃蛇）、棋盘文字描述（2048 / 连连看）。
 - **零运行时依赖**：仅使用原生 HTML / CSS / ES Modules 与 Canvas 2D、Web Audio。
 
 ## 项目结构
@@ -121,6 +146,7 @@ npm run dev            # 启动本地静态服务器
 ├── snake/index.html                # 贪吃蛇页面
 ├── gomoku/index.html               # 五子棋页面
 ├── 2048/index.html                 # 2048 页面
+├── lianliankan/index.html          # 连连看页面
 ├── public/favicon.svg              # 站点图标
 ├── src/
 │   ├── styles/
@@ -128,7 +154,8 @@ npm run dev            # 启动本地静态服务器
 │   │   ├── lobby.css               # 大厅卡片布局
 │   │   ├── main.css                # 贪吃蛇页面布局
 │   │   ├── gomoku.css              # 五子棋对局面板与结果卡片
-│   │   └── game2048.css            # 2048 棋盘几何、方块配色与动画
+│   │   ├── game2048.css            # 2048 棋盘几何、方块配色与动画
+│   │   └── lianliankan.css         # 连连看棋盘几何、牌面配色与连线动画
 │   └── js/
 │       ├── main.js                 # 贪吃蛇入口：装配模块、固定步长循环、偏好持久化
 │       ├── core/                   # 贪吃蛇纯逻辑，无浏览器 API，可在 Node 中测试
@@ -150,6 +177,16 @@ npm run dev            # 启动本地静态服务器
 │       │   │   ├── input-controller.js # 键盘、方向键与滑动手势 → 移动
 │       │   │   └── hud.js          # 计分板、结果卡片与棋盘文字描述
 │       │   └── main.js             # 2048 入口：装配、最高分持久化
+│       ├── lianliankan/
+│       │   ├── core/
+│       │   │   ├── constants.js    # 难度档、计分、图案与关卡递进参数
+│       │   │   ├── path-finder.js  # 至多三折的连线搜索（含棋盘外沿）
+│       │   │   └── lianliankan-game.js # 全部规则（生成/消除/提示/撤销/计时/过关），无浏览器 API
+│       │   ├── ui/
+│       │   │   ├── renderer.js     # DOM 牌面与 SVG 连线
+│       │   │   ├── input-controller.js # 点选与快捷键
+│       │   │   └── hud.js          # 计分板、结果卡片与棋盘文字描述
+│       │   └── main.js             # 连连看入口：装配、最高分与难度持久化
 │       ├── lobby/main.js           # 大厅：读取本地进度、数字键快捷入口
 │       ├── services/storage.js     # 带命名空间且容错的 localStorage 工厂
 │       └── ui/                     # 贪吃蛇与共用的 UI 模块
@@ -159,8 +196,8 @@ npm run dev            # 启动本地静态服务器
 │           └── sound-player.js     # Web Audio 合成音效（无二进制资源，两款游戏共用）
 ├── scripts/
 │   ├── dev-server.mjs              # 零依赖静态服务器（开发与预览）
-│   ├── build.mjs                   # esbuild 多页打包 + 内容哈希 + 重写四个入口页
-│   └── check-assets.mjs            # 四个入口页的静态资源引用完整性校验
+│   ├── build.mjs                   # esbuild 多页打包 + 内容哈希 + 重写五个入口页
+│   └── check-assets.mjs            # 五个入口页的静态资源引用完整性校验
 ├── tests/                          # Vitest 单元测试
 ├── task-manager/                   # 独立的全栈 Task Manager 工程（见下）
 └── .github/workflows/              # CI 与 GitHub Pages 部署
@@ -168,9 +205,9 @@ npm run dev            # 启动本地静态服务器
 
 ### 架构要点
 
-- **规则与表现分离**：`src/js/core/snake-game.js`、`src/js/gomoku/gomoku-game.js` 与 `src/js/game2048/core/game-2048.js` 都是不依赖任何浏览器 API 的类（贪吃蛇与 2048 的随机数通过构造参数注入），因此规则可以在 Node 中被确定性地测试；渲染、输入、音效、存储各自独立，入口 `main.js` 只负责装配与驱动，规则变更不会牵动渲染代码。
-- **三种驱动方式**：贪吃蛇是实时游戏，用固定步长累加器按 `tickIntervalMs` 推进逻辑、每帧用 `alpha`（距下一次 tick 的进度）在前后状态间插值，因此不同刷新率的设备表现一致；五子棋只在输入后变化，没有动画循环，仅按需重绘一帧；2048 同样是回合制，但用 DOM 方块承载动画——核心为每个方块提供稳定 id 与「移动前的位置」，渲染层据此复用元素，滑动与合并动画交给 CSS 过渡。
-- **样式分层**：`base.css` 提供设计变量与四页共用组件（按钮、棋盘框、遮罩、屏幕方向键等），页面样式表通过 `@import` 引入后只描述自身布局差异；构建时 esbuild 会内联 `@import`，最终每页只请求一个 CSS 文件。
+- **规则与表现分离**：`src/js/core/snake-game.js`、`src/js/gomoku/gomoku-game.js`、`src/js/game2048/core/game-2048.js` 与 `src/js/lianliankan/core/lianliankan-game.js` 都是不依赖任何浏览器 API 的类（贪吃蛇、2048 与连连看的随机数通过构造参数注入），因此规则可以在 Node 中被确定性地测试；渲染、输入、音效、存储各自独立，入口 `main.js` 只负责装配与驱动，规则变更不会牵动渲染代码。
+- **多种驱动方式**：贪吃蛇是实时游戏，用固定步长累加器按 `tickIntervalMs` 推进逻辑、每帧用 `alpha`（距下一次 tick 的进度）在前后状态间插值，因此不同刷新率的设备表现一致；五子棋只在输入后变化，没有动画循环，仅按需重绘一帧；2048 同样是回合制，但用 DOM 方块承载动画——核心为每个方块提供稳定 id 与「移动前的位置」，渲染层据此复用元素，滑动与合并动画交给 CSS 过渡；连连看也是点选回合制，限时关由入口用 `requestAnimationFrame` 把流逝时间注入 `tick()`，连线折点由内核给出、SVG 负责描边。
+- **样式分层**：`base.css` 提供设计变量与各页共用组件（按钮、棋盘框、遮罩、屏幕方向键等），页面样式表通过 `@import` 引入后只描述自身布局差异；构建时 esbuild 会内联 `@import`，最终每页只请求一个 CSS 文件。
 
 ## 开发脚本
 
@@ -181,7 +218,7 @@ npm run dev            # 启动本地静态服务器
 | `npm run preview`      | 以静态服务器预览 `dist/`                              |
 | `npm run lint`         | ESLint 检查（`npm run lint:fix` 自动修复）            |
 | `npm run format:check` | Prettier 格式检查（`npm run format` 自动格式化）      |
-| `npm run check:assets` | 校验四个入口页引用的本地资源是否存在且为相对路径      |
+| `npm run check:assets` | 校验五个入口页引用的本地资源是否存在且为相对路径      |
 | `npm test`             | 运行 Vitest 单元测试（`npm run test:watch` 监听模式） |
 | `npm run verify`       | 依次执行上面全部检查，等同于 CI 的核心步骤            |
 
@@ -195,12 +232,14 @@ npm run dev            # 启动本地静态服务器
 - `gomoku-game.test.js`：初始状态与参数校验、轮次交替与历史记录、越界与重复落子的拒绝、横 / 竖 / 两条斜线的胜负判定、补空成五、长连获胜、四子不算胜、异色不连、不跨越棋盘边界成线、和棋、终局后拒绝落子、撤销（含撤销决胜手后重新开局）与重置换先手。
 - `game-2048.test.js`：初始布局与参数校验、注入随机数后的可复现性、四个方向的滑动与列合并、「一次移动只合并一次」与从边缘开始结算、无效移动不计步不生成方块、计分累计、达成 2048 的胜利判定与「继续挑战」、胜利只播报一次、棋盘填满且无相邻同数时结束、渲染层所需的方块 id / 移动前位置 / 合并来源等元数据，以及 `loadBoard` 的入参校验与快照的不可变性。
 - `game-2048-ui.test.js`（jsdom）：渲染器生成背景格、方块的格坐标 / 数值 / 位数写入 DOM、滑动时复用同一个元素、合并方块滑入后被移除（下一次移动会立即清理）、重开后不残留旧元素；HUD 的计分板、棋盘文字描述、胜利与结束卡片；2048 输入控制器的按键、方向键与滑动映射。
+- `lianliankan-game.test.js`：三档难度与关卡递进参数、注入随机数后的可复现性、图案成对生成、零折 / 一折 / 两折合法连线、被阻挡不可连、不同图案不可消、外沿绕行、过关与死锁、连击与过关奖励、提示次数、撤销（含撤销决胜对）、倒计时失败、重开本关与切换难度。
+- `lianliankan-ui.test.js`（jsdom）：渲染器按棋盘尺寸生成牌面、空位隐藏、选中态与连线折点写入 SVG；HUD 的计分板、过关卡片与播报；输入控制器的点选与 `H` / `U` / `R` / `N` / `Esc` 映射。
 - `input-controller.test.js`（jsdom）：方向键与 `WASD` 映射、命令键、修饰键忽略、屏幕方向键、滑动与轻点手势、`detach()` 后不再响应。
 - `storage.test.js`：数值 / 布尔 / 字符串读写与白名单校验、命名空间隔离、损坏数据回退，以及 `localStorage` 抛异常或不可用时的内存降级。
 
 ## GitHub Actions
 
-- **`ci.yml` — 持续集成**：在任意分支 push、所有 Pull Request 及手动触发时运行，在 Node 20 / 22 / 24 矩阵中依次执行 `npm ci`、ESLint、Prettier 检查、静态资源校验、Vitest 测试、生产构建，并逐页断言 `dist/` 下四个入口页及各自哈希后的 JS/CSS 均已生成、HTML 已正确改写，同时检查 `.nojekyll` 与 favicon，最后上传 `dist/` 工件（保留 7 天）。同一分支的新提交会自动取消未完成的旧运行。
+- **`ci.yml` — 持续集成**：在任意分支 push、所有 Pull Request 及手动触发时运行，在 Node 20 / 22 / 24 矩阵中依次执行 `npm ci`、ESLint、Prettier 检查、静态资源校验、Vitest 测试、生产构建，并逐页断言 `dist/` 下五个入口页及各自哈希后的 JS/CSS 均已生成、HTML 已正确改写，同时检查 `.nojekyll` 与 favicon，最后上传 `dist/` 工件（保留 7 天）。同一分支的新提交会自动取消未完成的旧运行。
 - **`deploy-pages.yml` — 部署到 GitHub Pages**：在 `main` 分支 push 或手动触发时构建并发布 `dist/`。首次使用需在 **Settings → Pages → Build and deployment → Source** 选择 **GitHub Actions**；启用前该 workflow 会失败，但与 CI 相互独立。由于资源引用均为相对路径，站点在 `https://<user>.github.io/<repo>/` 子路径下也能正常工作。
 - **`dependabot.yml` — 依赖维护**：每周检查 npm 依赖与 GitHub Actions 版本更新，开发依赖的 minor/patch 更新会被合并到一个 PR 中。
 

@@ -10,6 +10,7 @@ export default defineConfig({
         'src/js/core/**/*.js',
         'src/js/gomoku/{constants,gomoku-game}.js',
         'src/js/game2048/core/**/*.js',
+        'src/js/lianliankan/core/**/*.js',
         'src/js/services/**/*.js',
       ],
       reporter: ['text', 'lcov'],

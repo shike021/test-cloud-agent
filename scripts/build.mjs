@@ -51,6 +51,12 @@ const PAGES = Object.freeze([
     script: 'src/js/game2048/main.js',
     style: 'src/styles/game2048.css',
   },
+  {
+    name: 'lianliankan',
+    html: 'lianliankan/index.html',
+    script: 'src/js/lianliankan/main.js',
+    style: 'src/styles/lianliankan.css',
+  },
 ]);
 
 /**

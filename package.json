@@ -1,8 +1,8 @@
 {
   "name": "web-arcade",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
-  "description": "生产级纯前端小游戏合集：贪吃蛇、15×15 双人五子棋与 2048，含游戏大厅、多页构建与 GitHub Pages 部署。",
+  "description": "生产级纯前端小游戏合集：贪吃蛇、15×15 双人五子棋、2048 与连连看，含游戏大厅、多页构建与 GitHub Pages 部署。",
   "type": "module",
   "license": "MIT",
   "engines": {

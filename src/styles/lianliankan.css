@@ -1,0 +1,235 @@
+/* ==========================================================================
+   连连看 · Link Match — page stylesheet
+   Layout: single column on small screens, board + side panel from 900px up.
+   Tile colour comes from `--tile-hue`; the SVG path layer is one cell larger
+   than the grid so a wrap-around polyline can travel through the padding.
+   ========================================================================== */
+
+@import './base.css';
+
+.lianliankan {
+  display: grid;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  grid-template-areas:
+    'scoreboard'
+    'board'
+    'controls'
+    'settings'
+    'legend';
+  justify-items: center;
+}
+
+.scoreboard {
+  grid-area: scoreboard;
+}
+.board {
+  grid-area: board;
+}
+.controls {
+  grid-area: controls;
+}
+.settings {
+  grid-area: settings;
+}
+.legend {
+  grid-area: legend;
+}
+
+.scoreboard--llk {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.scoreboard--llk .stat__value {
+  font-size: clamp(0.95rem, 2.8vw, 1.25rem);
+}
+
+.stat__value.is-urgent {
+  color: var(--color-danger);
+}
+
+@media (min-width: 720px) {
+  .scoreboard--llk {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .lianliankan {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-areas:
+      'board scoreboard'
+      'board controls'
+      'board settings'
+      'board legend';
+    align-content: start;
+    justify-items: stretch;
+  }
+
+  .board {
+    align-self: start;
+  }
+
+  .scoreboard--llk {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ------------------------------------------------------------------- board */
+
+.board--lianliankan {
+  --board-rows: 6;
+  --board-cols: 8;
+  --board-pad: clamp(10px, 2.2vw, 18px);
+  --tile-gap: clamp(3px, 0.8vw, 6px);
+  --path-duration: 280ms;
+
+  width: 100%;
+  max-width: min(760px, 96vw);
+  aspect-ratio: var(--board-cols) / var(--board-rows);
+  padding: var(--board-pad);
+  touch-action: manipulation;
+  background: linear-gradient(180deg, rgba(16, 27, 46, 0.96), rgba(10, 18, 32, 0.96));
+}
+
+.board__tiles {
+  position: absolute;
+  inset: var(--board-pad);
+  display: grid;
+  grid-template-columns: repeat(var(--board-cols), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--board-rows), minmax(0, 1fr));
+  gap: var(--tile-gap);
+}
+
+.board__paths {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  overflow: visible;
+  left: calc(var(--board-pad) - (100% - 2 * var(--board-pad)) / var(--board-cols));
+  right: calc(var(--board-pad) - (100% - 2 * var(--board-pad)) / var(--board-cols));
+  top: calc(var(--board-pad) - (100% - 2 * var(--board-pad)) / var(--board-rows));
+  bottom: calc(var(--board-pad) - (100% - 2 * var(--board-pad)) / var(--board-rows));
+}
+
+.board__path-line {
+  fill: none;
+  stroke: #ffe27a;
+  stroke-width: 0.14;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 0.12px rgba(255, 226, 122, 0.85));
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: llk-path-draw var(--path-duration) ease-out forwards;
+}
+
+@keyframes llk-path-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* -------------------------------------------------------------------- tile */
+
+.llk-tile {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(0.95rem, 4.2cqw, 1.55rem);
+  line-height: 1;
+  color: hsl(var(--tile-hue, 200) 80% 18%);
+  background: linear-gradient(
+    155deg,
+    hsl(var(--tile-hue, 200) 72% 72%),
+    hsl(var(--tile-hue, 200) 58% 48%)
+  );
+  border: 1px solid hsl(var(--tile-hue, 200) 50% 36% / 0.55);
+  border-radius: clamp(6px, 1.4vw, 10px);
+  box-shadow: 0 4px 10px rgba(2, 8, 20, 0.35);
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    filter var(--transition);
+}
+
+.board__tiles {
+  container-type: size;
+}
+
+.llk-tile:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.llk-tile:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.llk-tile.is-selected {
+  z-index: 3;
+  box-shadow:
+    0 0 0 2px #fff6dd,
+    0 0 0 4px hsl(var(--tile-hue, 200) 80% 45%),
+    0 8px 18px rgba(2, 8, 20, 0.45);
+  transform: scale(1.04);
+}
+
+.llk-tile.is-hint {
+  z-index: 2;
+  animation: llk-hint-pulse 900ms ease-in-out infinite;
+}
+
+.llk-tile.is-matching {
+  z-index: 3;
+  filter: brightness(1.15);
+}
+
+.llk-tile[hidden] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@keyframes llk-hint-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px rgba(255, 226, 122, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(255, 226, 122, 0.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board--lianliankan {
+    --path-duration: 0ms;
+  }
+
+  .llk-tile.is-hint {
+    animation: none;
+    box-shadow: 0 0 0 3px rgba(255, 226, 122, 0.85);
+  }
+}
+
+/* ----------------------------------------------------------------- overlay */
+
+.board--lianliankan .overlay {
+  z-index: 4;
+  padding: clamp(0.6rem, 2.5vw, 1rem);
+  background: linear-gradient(180deg, rgba(7, 12, 23, 0.55), rgba(7, 12, 23, 0.8));
+}
+
+.overlay[data-status='cleared'] .overlay__title {
+  color: var(--color-accent);
+}
+
+.overlay[data-status='failed'] .overlay__title {
+  color: var(--color-danger);
+}
