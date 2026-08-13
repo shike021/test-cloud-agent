@@ -8,7 +8,7 @@ import {
   resolveStageConfig,
   startingStageForDifficulty,
 } from './constants.js';
-import { cellsEqual, findLinkPath } from './path-finder.js';
+import { findLinkPath } from './path-finder.js';
 
 /**
  * @typedef {import('./constants.js').DifficultyId} DifficultyId
